@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSG SOULS — AdPrivacy Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--blood:#8b0000;--ember:#c0392b;--gold:#c9a84c;--dim-gold:#8a6f2e;--bone:#e8dcc8;--shadow:#0d0d0d;--soul:#c9a84c;--poison:#2d7a3a;--estus:#e67e22;--timer-ok:#4caf50;--timer-warn:#ff9800;--timer-danger:#f44336;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--shadow);color:var(--bone);font-family:'Crimson Text',serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.6;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+#title-screen{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0a00 0%,#0d0d0d 70%);position:relative;overflow:hidden;padding:30px 20px;}
+#title-screen::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,rgba(139,0,0,0.15),transparent);pointer-events:none;}
+.title-particles{position:absolute;inset:0;overflow:hidden;}
+.particle{position:absolute;width:2px;height:2px;background:var(--gold);border-radius:50%;animation:float-up linear infinite;opacity:0;}
+@keyframes float-up{0%{transform:translateY(100vh);opacity:0;}10%{opacity:.6;}90%{opacity:.2;}100%{transform:translateY(-10vh) translateX(40px);opacity:0;}}
+.brand-header{display:flex;justify-content:center;margin-bottom:10px;animation:logo-appear 1.5s ease forwards;opacity:0;}
+.brand-logo-img{width:110px;height:110px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(201,168,76,.45)) drop-shadow(0 0 40px rgba(201,168,76,.2));animation:pulse-glow 3s ease-in-out infinite;}
+@keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,.45)) drop-shadow(0 0 40px rgba(201,168,76,.2));}50%{filter:drop-shadow(0 0 30px rgba(201,168,76,.7)) drop-shadow(0 0 60px rgba(201,168,76,.3));}}
+.brand-wordmark{text-align:center;margin-bottom:6px;animation:logo-appear 1.8s ease forwards;opacity:0;}
+.brand-ad{font-family:'Cinzel',serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;color:var(--bone);letter-spacing:.04em;}
+.brand-privacy{font-family:'Cinzel',serif;font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;color:var(--gold);letter-spacing:.04em;}
+.brand-consulting{font-family:'Cinzel',serif;font-size:clamp(.55rem,1.8vw,.72rem);letter-spacing:.5em;color:var(--dim-gold);text-transform:uppercase;margin-top:2px;}
+@keyframes logo-appear{from{opacity:0;transform:scale(.8) translateY(-20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes fade-in{to{opacity:1;}}
+.title-divider{width:320px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:14px 0;position:relative;}
+.title-divider::before{content:'\2694';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--gold);font-size:1.2rem;background:#1a0a00;padding:0 8px;}
+.game-title{font-family:'Cinzel',serif;font-size:clamp(2rem,7vw,3.8rem);font-weight:900;letter-spacing:.15em;color:var(--gold);text-shadow:0 0 30px rgba(201,168,76,.4),2px 2px 0 var(--blood);text-align:center;animation:logo-appear 2s ease forwards;opacity:0;}
+.game-subtitle{font-family:'Cinzel',serif;font-size:clamp(.75rem,2.2vw,1rem);letter-spacing:.4em;color:var(--blood);text-transform:uppercase;text-align:center;animation:fade-in 3s 1s ease forwards;opacity:0;margin-top:6px;}
+.lore-text{max-width:500px;text-align:center;font-style:italic;color:#9a8a6a;font-size:clamp(.85rem,2vw,1rem);line-height:1.8;padding:0 20px;animation:fade-in 3s 1.5s ease forwards;opacity:0;margin-top:16px;}
+.start-btn{margin-top:14px;padding:14px 50px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.3em;cursor:pointer;position:relative;overflow:hidden;text-transform:uppercase;transition:all .3s;animation:fade-in 3s 2s ease forwards;opacity:0;}
+.start-btn::before{content:'';position:absolute;inset:0;background:var(--blood);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;z-index:-1;}
+.start-btn:hover::before{transform:scaleX(1);}
+.start-btn:hover{border-color:var(--ember);color:#fff;box-shadow:0 0 20px rgba(139,0,0,.5);}
+.title-warning{margin-top:12px;color:#5a4a3a;font-size:.75rem;letter-spacing:.1em;animation:fade-in 3s 2.5s ease forwards;opacity:0;}
+
+/* LEADERBOARD */
+#leaderboard-screen{flex-direction:column;align-items:center;background:radial-gradient(ellipse at top,#0a0a1a 0%,#0d0d0d 60%);padding:30px 20px;}
+.lb-header{font-family:'Cinzel',serif;font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.5);margin-bottom:6px;text-align:center;}
+.lb-sub{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.35em;color:var(--blood);text-transform:uppercase;margin-bottom:24px;}
+.lb-table{width:100%;max-width:600px;border-collapse:collapse;}
+.lb-table th{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;color:var(--dim-gold);text-transform:uppercase;border-bottom:1px solid rgba(201,168,76,.2);padding:8px 12px;text-align:left;}
+.lb-table td{padding:10px 12px;font-size:.92rem;border-bottom:1px solid rgba(255,255,255,.04);}
+.lb-table tr:hover td{background:rgba(201,168,76,.04);}
+.lb-rank{font-family:'Cinzel',serif;color:var(--dim-gold);font-size:.85rem;}
+.lb-rank.gold{color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,.5);}
+.lb-rank.silver{color:#c0c0c0;}
+.lb-rank.bronze{color:#cd7f32;}
+.lb-name{color:var(--bone);font-weight:600;}
+.lb-score{color:var(--soul);font-family:'Cinzel',serif;font-weight:700;}
+.lb-correct{color:var(--poison);font-size:.85rem;}
+.lb-badge{display:inline-block;padding:2px 8px;font-size:.65rem;font-family:'Cinzel',serif;border-radius:2px;letter-spacing:.1em;}
+.lb-badge.legend{background:rgba(201,168,76,.15);border:1px solid var(--dim-gold);color:var(--gold);}
+.lb-badge.warrior{background:rgba(139,0,0,.15);border:1px solid var(--blood);color:var(--ember);}
+.lb-badge.apprentice{background:rgba(201,168,76,.08);border:1px solid #6a5520;color:var(--dim-gold);}
+.lb-empty{text-align:center;color:#5a4a3a;font-style:italic;padding:30px;font-size:.9rem;}
+.lb-btn-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center;}
+.lb-btn{padding:12px 28px;background:transparent;font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:all .3s;}
+.lb-btn.primary{border:1px solid var(--gold);color:var(--gold);}
+.lb-btn.secondary{border:1px solid #3a3a3a;color:#7a7a7a;}
+.lb-btn:hover{background:rgba(255,255,255,.05);}
+.lb-role-tabs{display:flex;gap:8px;margin-bottom:16px;}
+.lb-tab{padding:8px 20px;background:transparent;border:1px solid #3a2010;color:#6a5a3a;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:all .3s;}
+.lb-tab.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+.lb-tab:hover{border-color:var(--dim-gold);color:var(--dim-gold);}
+.lb-add-entry{width:100%;max-width:600px;margin-top:20px;padding:16px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);}
+.lb-add-title{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.25em;color:var(--dim-gold);text-transform:uppercase;margin-bottom:10px;}
+.lb-add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.lb-add-input{flex:1;min-width:90px;padding:8px 10px;background:rgba(0,0,0,.5);border:1px solid #3a2010;border-bottom:2px solid var(--dim-gold);color:var(--bone);font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.05em;outline:none;transition:border-color .3s;}
+.lb-add-score-input{max-width:110px;}
+.lb-add-correct-input{max-width:130px;}
+.lb-add-input:focus{border-bottom-color:var(--gold);}
+.lb-add-input::placeholder{color:#4a3a2a;font-size:.7rem;}
+.lb-add-btn{padding:9px 18px;background:transparent;border:1px solid var(--dim-gold);color:var(--dim-gold);font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:all .3s;white-space:nowrap;}
+.lb-add-btn:hover{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold);}
+
+/* NAME SCREEN */
+#name-screen{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0a100a 0%,#0d0d0d 70%);padding:30px 20px;}
+.role-chosen-tag{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.2em;color:var(--dim-gold);text-transform:uppercase;margin-bottom:14px;padding:6px 12px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.05);}
+.name-box{background:linear-gradient(135deg,#1a0d00,#0f0f0f);border:1px solid #3a2010;border-top:3px solid var(--gold);padding:32px;max-width:440px;width:100%;text-align:center;}
+.name-title{font-family:'Cinzel',serif;font-size:clamp(1.2rem,4vw,1.8rem);color:var(--gold);margin-bottom:8px;}
+.name-sub{color:#7a6a4a;font-style:italic;font-size:.9rem;margin-bottom:22px;}
+.name-input{width:100%;padding:12px 16px;background:rgba(0,0,0,.5);border:1px solid #3a2010;border-bottom:2px solid var(--gold);color:var(--bone);font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.1em;outline:none;transition:border-color .3s;text-align:center;margin-bottom:18px;}
+.name-input:focus{border-bottom-color:var(--ember);}
+.name-input::placeholder{color:#4a3a2a;}
+.name-btn{padding:13px 38px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Cinzel',serif;font-size:.92rem;letter-spacing:.25em;cursor:pointer;text-transform:uppercase;transition:all .3s;width:100%;}
+.name-btn:hover{background:rgba(201,168,76,.1);box-shadow:0 0 20px rgba(201,168,76,.2);}
+
+/* GAME */
+#game-screen{flex-direction:column;background:radial-gradient(ellipse at top,#1a0800 0%,#0d0d0d 60%);min-height:100vh;}
+.hud{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(0,0,0,.88);border-bottom:1px solid #2a1a0a;flex-wrap:wrap;gap:7px;}
+.hud-logo{display:flex;align-items:center;gap:8px;}
+.hud-logo-img{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(201,168,76,.4));}
+.hud-title-small{font-family:'Cinzel',serif;font-size:.72rem;color:var(--gold);letter-spacing:.15em;line-height:1.2;}
+.hud-title-small span{color:var(--dim-gold);display:block;font-size:.58rem;}
+.hp-bar-container{display:flex;flex-direction:column;gap:3px;}
+.hp-label{font-family:'Cinzel',serif;font-size:.56rem;color:var(--blood);letter-spacing:.2em;text-transform:uppercase;}
+.hp-bar{width:150px;height:11px;background:#1a0a0a;border:1px solid var(--blood);position:relative;overflow:hidden;}
+.hp-fill{height:100%;background:linear-gradient(90deg,var(--blood),var(--ember));transition:width .5s ease;}
+.timer-container{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.timer-label{font-family:'Cinzel',serif;font-size:.56rem;color:var(--estus);letter-spacing:.15em;text-transform:uppercase;}
+.timer-ring-wrap{position:relative;width:42px;height:42px;}
+.timer-ring-svg{transform:rotate(-90deg);}
+.timer-circle-bg{fill:none;stroke:#2a1a0a;stroke-width:4;}
+.timer-circle{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .5s;stroke-dasharray:113;stroke-dashoffset:0;}
+.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--gold);}
+.estus-container{display:flex;align-items:center;gap:6px;}
+.estus-label{font-family:'Cinzel',serif;font-size:.56rem;color:var(--estus);letter-spacing:.1em;}
+.estus-flasks{display:flex;gap:4px;}
+.flask{width:15px;height:21px;background:linear-gradient(180deg,var(--estus),#a05010);border:1px solid #8a6020;border-radius:3px 3px 6px 6px;cursor:pointer;transition:all .2s;position:relative;}
+.flask.empty{background:#2a2a2a;border-color:#3a3a3a;opacity:.4;}
+.flask:not(.empty):hover{filter:brightness(1.3);box-shadow:0 0 8px var(--estus);}
+.flask::before{content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);width:7px;height:2px;background:rgba(255,255,255,.3);border-radius:2px;}
+.level-info{font-family:'Cinzel',serif;font-size:.72rem;color:var(--dim-gold);text-align:right;}
+.souls-count{color:var(--soul);font-weight:700;}
+.game-area{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 12px;position:relative;}
+.level-header{text-align:center;margin-bottom:14px;}
+.level-name{font-family:'Cinzel',serif;font-size:clamp(.85rem,2.6vw,1.1rem);color:var(--blood);letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px;}
+.room-name{font-family:'Cinzel',serif;font-size:clamp(1rem,3.2vw,1.5rem);color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.3);}
+.scenario-card{width:100%;max-width:650px;background:linear-gradient(135deg,#1a0d00,#0f0f0f);border:1px solid #3a2010;border-top:3px solid var(--blood);padding:20px;position:relative;margin-bottom:14px;box-shadow:0 10px 40px rgba(0,0,0,.8);animation:card-reveal .6s ease;}
+@keyframes card-reveal{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.scenario-card::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.3;}
+.enemy-icon{font-size:2.4rem;text-align:center;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(139,0,0,.6));animation:enemy-breathe 2s ease-in-out infinite;}
+@keyframes enemy-breathe{0%,100%{transform:scale(1) rotate(-2deg);}50%{transform:scale(1.05) rotate(2deg);}}
+.enemy-name{font-family:'Cinzel',serif;font-size:clamp(.88rem,2.4vw,1.15rem);color:var(--blood);text-align:center;margin-bottom:12px;letter-spacing:.15em;}
+.scenario-text{font-size:clamp(.86rem,2.2vw,.98rem);line-height:1.8;color:var(--bone);font-style:italic;border-left:2px solid var(--blood);padding-left:12px;}
+.scenario-tag{display:inline-block;margin-top:9px;padding:2px 9px;background:rgba(139,0,0,.2);border:1px solid var(--blood);font-size:.62rem;font-family:'Cinzel',serif;color:var(--blood);letter-spacing:.2em;text-transform:uppercase;}
+.choices-container{width:100%;max-width:650px;display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.choice-btn{padding:11px 16px;background:linear-gradient(135deg,#1a0d00,#140a00);border:1px solid #3a2010;color:var(--bone);font-family:'Crimson Text',serif;font-size:clamp(.86rem,2.2vw,.98rem);text-align:left;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;line-height:1.5;}
+.choice-letter{font-family:'Cinzel',serif;font-size:.72rem;color:var(--gold);background:rgba(201,168,76,.1);border:1px solid var(--dim-gold);width:23px;height:23px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:2px;}
+.choice-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(139,0,0,.08));opacity:0;transition:opacity .25s;}
+.choice-btn:hover:not(:disabled){border-color:var(--gold);box-shadow:0 0 15px rgba(201,168,76,.2);transform:translateX(4px);}
+.choice-btn:hover:not(:disabled)::before{opacity:1;}
+.choice-btn.correct{border-color:var(--poison);background:linear-gradient(135deg,#0a1a0a,#051005);animation:correct-flash .5s ease;}
+.choice-btn.wrong{border-color:var(--blood);background:linear-gradient(135deg,#1a0000,#100000);animation:wrong-flash .5s ease;}
+.choice-btn.timeout-reveal{border-color:#4a8a5a;background:linear-gradient(135deg,#071207,#050f05);}
+.choice-btn:disabled{cursor:not-allowed;opacity:.7;transform:none!important;}
+@keyframes correct-flash{0%,100%{box-shadow:0 0 0 transparent;}50%{box-shadow:0 0 25px rgba(45,122,58,.6);}}
+@keyframes wrong-flash{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-4px);}40%,80%{transform:translateX(4px);}}
+.feedback-panel{width:100%;max-width:650px;padding:16px;border:1px solid;margin-bottom:14px;display:none;animation:card-reveal .4s ease;position:relative;}
+.feedback-panel.success{border-color:var(--poison);background:linear-gradient(135deg,#071207,#050f05);}
+.feedback-panel.failure{border-color:var(--blood);background:linear-gradient(135deg,#120505,#0f0303);}
+.feedback-panel.timeout{border-color:#6a4a10;background:linear-gradient(135deg,#120e00,#0f0a00);}
+.feedback-header{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.6vw,1.15rem);margin-bottom:9px;display:flex;align-items:center;gap:9px;}
+.feedback-header.success{color:#4caf50;}
+.feedback-header.failure{color:var(--ember);}
+.feedback-header.timeout{color:var(--estus);}
+.feedback-text{font-size:clamp(.83rem,1.9vw,.97rem);line-height:1.7;color:#c0a880;}
+.dsgvo-ref{margin-top:9px;padding:7px 11px;background:rgba(0,0,0,.4);border-left:3px solid var(--gold);font-size:.76rem;color:var(--dim-gold);font-style:italic;}
+.continue-btn{margin-top:12px;padding:11px 26px;background:transparent;border:1px solid;font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:all .3s;display:block;}
+.continue-btn.success{border-color:var(--poison);color:#4caf50;}
+.continue-btn.failure{border-color:var(--blood);color:var(--ember);}
+.continue-btn.timeout{border-color:#8a6020;color:var(--estus);}
+.continue-btn:hover{background:rgba(255,255,255,.05);transform:translateX(4px);}
+.lore-stone{width:100%;max-width:650px;padding:11px 14px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);font-size:.76rem;color:#7a6a4a;font-style:italic;text-align:center;position:relative;margin-bottom:14px;}
+.lore-stone::before{content:'\1F4DC';position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:.95rem;filter:grayscale(.5);}
+.progress-bar-container{width:100%;max-width:650px;margin-bottom:12px;}
+.progress-label{font-family:'Cinzel',serif;font-size:.6rem;color:#5a4a3a;letter-spacing:.2em;margin-bottom:3px;text-transform:uppercase;}
+.progress-bar{height:4px;background:#1a0a00;border:1px solid #2a1a0a;position:relative;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blood),var(--gold));transition:width .5s ease;position:relative;}
+.progress-fill::after{content:'\1F525';position:absolute;right:-8px;top:50%;transform:translateY(-50%);font-size:.78rem;}
+.campfire-hint{font-size:.66rem;color:#4a3a2a;text-align:center;font-style:italic;padding:7px;}
+
+/* DEATH */
+#death-screen{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#200000,#000);position:relative;overflow:hidden;text-align:center;padding:20px;}
+.death-text{font-family:'Cinzel',serif;font-size:clamp(3rem,12vw,7rem);font-weight:900;color:var(--blood);text-shadow:0 0 60px rgba(139,0,0,.8);animation:death-appear 1.5s ease;line-height:1;margin-bottom:10px;}
+.death-subtitle{font-family:'Cinzel',serif;font-size:clamp(.9rem,3vw,1.3rem);color:#6a2020;letter-spacing:.3em;margin-bottom:18px;}
+@keyframes death-appear{from{opacity:0;transform:scale(1.5);filter:blur(10px);}to{opacity:1;transform:scale(1);filter:blur(0);}}
+.death-lore{max-width:400px;color:#5a3a3a;font-style:italic;font-size:clamp(.85rem,2vw,1rem);line-height:1.7;margin-bottom:22px;}
+.death-stats{background:rgba(139,0,0,.1);border:1px solid var(--blood);padding:13px 26px;margin-bottom:22px;font-family:'Cinzel',serif;font-size:.8rem;color:#9a5a5a;}
+.retry-btn{padding:13px 44px;background:transparent;border:1px solid var(--blood);color:var(--ember);font-family:'Cinzel',serif;font-size:.95rem;letter-spacing:.3em;cursor:pointer;text-transform:uppercase;transition:all .3s;animation:pulse-border 2s ease-in-out infinite;margin:5px;}
+@keyframes pulse-border{0%,100%{box-shadow:0 0 0 transparent;}50%{box-shadow:0 0 20px rgba(139,0,0,.4);}}
+.retry-btn:hover{background:rgba(139,0,0,.2);box-shadow:0 0 30px rgba(139,0,0,.5);}
+
+/* VICTORY */
+#victory-screen{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1000,#000);padding:20px;text-align:center;}
+.victory-logo-img{width:110px;height:110px;object-fit:contain;margin-bottom:14px;animation:victory-float 3s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(201,168,76,.8));}
+@keyframes victory-float{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-10px) rotate(2deg);}}
+.victory-text{font-family:'Cinzel',serif;font-size:clamp(1.5rem,6vw,3rem);font-weight:900;color:var(--gold);text-shadow:0 0 30px rgba(201,168,76,.6);margin-bottom:7px;}
+.victory-sub{font-family:'Cinzel',serif;font-size:clamp(.75rem,2vw,.92rem);color:var(--dim-gold);letter-spacing:.3em;margin-bottom:14px;}
+.victory-stats{background:rgba(201,168,76,.05);border:1px solid var(--dim-gold);padding:16px 26px;margin:14px 0;max-width:400px;width:100%;}
+.stat-row{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:.8rem;color:var(--bone);padding:5px 0;border-bottom:1px solid rgba(201,168,76,.1);}
+.stat-row:last-child{border-bottom:none;}
+.stat-value{color:var(--gold);}
+.victory-quote{max-width:380px;font-style:italic;color:#8a7a5a;font-size:.86rem;line-height:1.7;margin:12px 0;}
+.play-again-btn{padding:11px 36px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.3em;cursor:pointer;text-transform:uppercase;transition:all .3s;margin:5px;}
+.play-again-btn.secondary{border-color:var(--dim-gold);color:var(--dim-gold);}
+.play-again-btn:hover{background:rgba(201,168,76,.1);box-shadow:0 0 20px rgba(201,168,76,.2);}
+.damage-overlay{position:fixed;inset:0;background:rgba(139,0,0,.4);pointer-events:none;opacity:0;z-index:1000;transition:opacity .15s;}
+.damage-overlay.flash{animation:damage-flash .5s ease;}
+@keyframes damage-flash{0%,100%{opacity:0;}20%{opacity:.5;}60%{opacity:.3;}}
+.soul-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cinzel',serif;font-size:1.4rem;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.8);opacity:0;pointer-events:none;z-index:1001;}
+.soul-popup.show{animation:soul-rise 1.5s ease forwards;}
+@keyframes soul-rise{0%{opacity:0;transform:translate(-50%,-50%) scale(.5);}30%{opacity:1;transform:translate(-50%,-80%) scale(1.1);}70%{opacity:.7;transform:translate(-50%,-120%) scale(1);}100%{opacity:0;transform:translate(-50%,-160%) scale(.8);}}
+/* ROLE SCREEN */
+#role-screen{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0d0a00 0%,#0d0d0d 70%);padding:24px 16px;}
+.role-box{width:100%;max-width:560px;text-align:center;}
+.role-title{font-family:'Cinzel',serif;font-size:clamp(1.3rem,4vw,2rem);color:var(--gold);margin-bottom:6px;}
+.role-sub{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.3em;color:var(--blood);text-transform:uppercase;margin-bottom:24px;}
+.role-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+.role-card{flex:1 1 220px;max-width:260px;padding:22px 18px;background:linear-gradient(135deg,#1a0d00,#0f0f0f);border:1px solid #3a2010;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.role-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(139,0,0,.06));opacity:0;transition:opacity .3s;}
+.role-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.6);}
+.role-card:hover::before{opacity:1;}
+.role-card-icon{font-size:2.8rem;margin-bottom:10px;filter:drop-shadow(0 0 10px rgba(201,168,76,.3));}
+.role-card-name{font-family:'Cinzel',serif;font-size:clamp(.9rem,2.5vw,1.1rem);color:var(--gold);margin-bottom:10px;letter-spacing:.05em;}
+.role-card-desc{font-size:.82rem;color:#9a8a6a;line-height:1.7;font-style:italic;margin-bottom:12px;}
+.role-card-diff{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.2em;color:var(--dim-gold);text-transform:uppercase;}
+.role-back-btn{padding:10px 28px;background:transparent;border:1px solid #3a3a3a;color:#6a6a6a;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:all .3s;}
+.role-back-btn:hover{border-color:var(--dim-gold);color:var(--dim-gold);}
+
+@media(max-width:600px){
+  .hud{padding:6px 8px;flex-wrap:wrap;gap:5px;justify-content:space-between;}
+  .hud-logo{order:0;flex:0 0 auto;}
+  .hp-bar-container{order:1;flex:1 1 auto;}
+  .hp-bar{width:100%;max-width:160px;}
+  #timer-container-wrap{order:2;flex:0 0 auto;}
+  .estus-container{order:3;flex:0 0 auto;}
+  .level-info{order:4;flex:1 1 100%;display:flex;justify-content:space-between;border-top:1px solid #2a1a0a;padding-top:4px;margin-top:2px;}
+  .game-area{padding:10px 9px;}
+  .scenario-card{padding:13px;}
+  .choice-btn{padding:10px 12px;}
+  .hud-title-small{display:none;}
+}
+@media(max-width:380px){
+  .hp-bar{max-width:110px;}
+  .brand-logo-img{width:80px;height:80px;}
+}
+</style>
+</head>
+<body>
+<div class="damage-overlay" id="damage-overlay"></div>
+<div class="soul-popup" id="soul-popup">+500 SEELEN</div>
+
+<!-- TITLE SCREEN -->
+<div class="screen" id="title-screen" style="display:flex;flex-direction:column;">
+<div class="title-particles" id="particles"></div>
+<div class="brand-header">
+  <img class="brand-logo-img" id="title-logo" src="" alt="AdPrivacy Logo">
+</div>
+<div class="brand-wordmark">
+  <span class="brand-ad">Ad</span><span class="brand-privacy">Privacy</span>
+  <div class="brand-consulting">Consulting</div>
+</div>
+<div class="title-divider"></div>
+<div class="game-title">DSG SOULS</div>
+<div class="game-subtitle">Die Datenschutz-Katakomben &mdash; Schweiz Edition</div>
+<p class="lore-text">
+&#8222;In den Katakomben der Schweizer Datenwelt lauern Compliance-Geister und der EDÖB wacht.
+Nur wer das revDSG beherrscht, kann das Königreich der Privatheit schützen...&#8220;
+</p>
+<button class="start-btn" onclick="showRoleScreen()">BEGINNE DEINE REISE</button>
+<button class="start-btn" style="border-color:var(--dim-gold);color:var(--dim-gold);" onclick="showLeaderboard()">&#127942; RANGLISTE</button>
+<p class="title-warning">&#9888;&#65039; 20 Fragen &bull; 30 Sekunden pro Frage &bull; W&#228;hle deine Rolle</p>
+</div>
+
+<!-- NAME SCREEN -->
+<div class="screen" id="name-screen">
+<div class="name-box">
+  <div class="role-chosen-tag"><span id="role-icon">⚖️</span> <span id="role-label">DPO / Datenschutzberater-Quiz</span></div>
+  <div class="name-title">&#9876;&#65039; Wähle deinen Namen</div>
+  <div class="name-sub">Dein Ruhm wird in der Rangliste verewigt</div>
+  <input class="name-input" id="player-name-input" type="text" maxlength="20" placeholder="Dein Krieger-Name...">
+  <button class="name-btn" onclick="startGame(false)">&#9876;&#65039; KAMPFMODUS — IN DIE KATAKOMBEN</button>
+  <button class="name-btn learn-btn" onclick="startGame(true)" style="margin-top:10px;border-color:var(--dim-gold);color:var(--dim-gold);">&#128218; LERNMODUS — OHNE ZEITDRUCK</button>
+  <button class="name-btn" onclick="showRoleScreen()" style="margin-top:10px;border-color:#3a2010;color:#5a4a2a;font-size:.75rem;">&#8592; Rolle wechseln</button>
+  <div style="margin-top:12px;font-size:.72rem;color:#4a3a2a;font-style:italic;line-height:1.6;">
+    Kampfmodus: Timer · HP-Verlust · Rangliste<br>
+    Lernmodus: Kein Timer · Kein HP-Verlust · Ausführliche Erklärungen
+  </div>
+</div>
+</div>
+
+<!-- ROLE SCREEN -->
+<div class="screen" id="role-screen">
+<div class="role-box">
+  <div class="role-title">&#128100; W&#228;hle deine Rolle</div>
+  <div class="role-sub">F&#252;r wen spielst du heute?</div>
+  <div class="role-cards">
+    <div class="role-card" onclick="selectRole('employee')">
+      <div class="role-card-icon">&#128188;</div>
+      <div class="role-card-name">Mitarbeiter</div>
+      <div class="role-card-desc">Datenschutz im Arbeitsalltag — praktische Fragen ohne Fachjargon. Was darf ich? Was nicht? Was tue ich bei einem Vorfall?</div>
+      <div class="role-card-diff">&#11088; Einsteiger-Niveau</div>
+    </div>
+    <div class="role-card" onclick="selectRole('dpo')">
+      <div class="role-card-icon">&#9878;&#65039;</div>
+      <div class="role-card-name">DPO / Datenschutzberater</div>
+      <div class="role-card-desc">revDSG-Expertenwissen — Artikel, Fristen, Haftung, EDÖB-Befugnisse, internationale Transfers und mehr.</div>
+      <div class="role-card-diff">&#128308; Experten-Niveau</div>
+    </div>
+  </div>
+  <button class="role-back-btn" onclick="showScreen('title-screen')">&#8592; Zur&#252;ck</button>
+</div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="screen" id="leaderboard-screen">
+<div class="lb-header">&#127942; Rangliste der Krieger</div>
+<div class="lb-sub">Die tapfersten Datenschutz-Helden der Schweiz</div>
+<div id="lb-status" style="font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.2em;color:#4a3a2a;margin-bottom:10px;min-height:1.2em;"></div>
+<div class="lb-role-tabs">
+  <button class="lb-tab active" id="tab-employee" onclick="switchLbTab('employee')">&#128188; Mitarbeiter</button>
+  <button class="lb-tab" id="tab-dpo" onclick="switchLbTab('dpo')">&#9878;&#65039; DPO</button>
+</div>
+<table class="lb-table">
+  <thead><tr><th>#</th><th>Name</th><th>Seelen</th><th>Richtig</th><th>Titel</th></tr></thead>
+  <tbody id="lb-body"><tr><td colspan="5" class="lb-empty">Noch keine Einträge.</td></tr></tbody>
+</table>
+<div class="lb-add-entry">
+  <div class="lb-add-title">Eintrag manuell hinzufügen</div>
+  <div class="lb-add-row">
+    <input class="lb-add-input" id="lb-manual-name" type="text" maxlength="20" placeholder="Name..." />
+    <input class="lb-add-input lb-add-score-input" id="lb-manual-score" type="number" min="0" max="99999" placeholder="Seelen..." />
+    <input class="lb-add-input lb-add-correct-input" id="lb-manual-correct" type="number" min="0" max="20" placeholder="Richtig (0-20)" />
+    <button class="lb-add-btn" onclick="addManualEntry()">+ EINTRAGEN</button>
+  </div>
+</div>
+<div class="lb-btn-row">
+  <button class="lb-btn primary" onclick="showNameScreen()">&#9876;&#65039; SPIELEN</button>
+  <button class="lb-btn secondary" onclick="showScreen('title-screen')">&#8592; ZURÜCK</button>
+  <button class="lb-btn secondary" style="color:#8b0000;border-color:#8b0000;" onclick="clearLeaderboard()">&#128465; LÖSCHEN</button>
+</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="game-screen">
+<div class="hud">
+  <div class="hud-logo">
+    <img class="hud-logo-img" id="hud-logo" src="" alt="AdPrivacy">
+    <div class="hud-title-small">DSG SOULS<span id="hud-role-label">AdPrivacy Consulting</span></div>
+  </div>
+  <div class="hp-bar-container">
+    <div class="hp-label">&#9876;&#65039; Compliance-Leben</div>
+    <div class="hp-bar"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
+  </div>
+  <div class="timer-container" id="timer-container-wrap">
+    <div class="timer-label">&#9201; Zeit</div>
+    <div class="timer-ring-wrap">
+      <svg class="timer-ring-svg" width="42" height="42" viewBox="0 0 42 42">
+        <circle class="timer-circle-bg" cx="21" cy="21" r="17"/>
+        <circle class="timer-circle" id="timer-circle" cx="21" cy="21" r="17" stroke="var(--timer-ok)" style="stroke-dasharray:107;stroke-dashoffset:0;"/>
+      </svg>
+      <div class="timer-text" id="timer-display">30</div>
+    </div>
+  </div>
+  <div class="estus-container">
+    <div class="estus-label">&#129514; Hinweis</div>
+    <div class="estus-flasks" id="estus-flasks">
+      <div class="flask" onclick="useHint()" title="Hinweis verwenden"></div>
+      <div class="flask" onclick="useHint()" title="Hinweis verwenden"></div>
+    </div>
+  </div>
+  <div class="level-info">
+    <div>Fragen: <span id="q-counter">1/20</span></div>
+    <div>Seelen: <span class="souls-count" id="souls-display">0</span></div>
+  </div>
+</div>
+<div class="game-area">
+  <div class="progress-bar-container">
+    <div class="progress-label">Fortschritt durch die Katakomben</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div id="learn-banner" style="display:none;width:100%;max-width:650px;margin-bottom:10px;padding:8px 14px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);font-family:'Cinzel',serif;font-size:.68rem;color:var(--dim-gold);letter-spacing:.2em;text-align:center;">&#128218; LERNMODUS — Kein Zeitdruck · Kein HP-Verlust · Ausführliche Erklärungen</div>
+  <div class="level-header">
+    <div id="diff-badge" style="font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.2em;margin-bottom:4px;text-transform:uppercase;"></div>
+    <div class="level-name" id="level-name">Ebene I</div>
+    <div class="room-name" id="room-name">Die revDSG-Katakomben</div>
+  </div>
+  <div class="scenario-card">
+    <div class="enemy-icon" id="enemy-icon">&#128121;</div>
+    <div class="enemy-name" id="enemy-name">Der Datendämon</div>
+    <div class="scenario-text" id="scenario-text">Lade...</div>
+    <span class="scenario-tag" id="scenario-tag">revDSG Art. ??</span>
+  </div>
+  <div class="choices-container" id="choices-container"></div>
+  <div class="feedback-panel" id="feedback-panel">
+    <div class="feedback-header" id="feedback-header"></div>
+    <div class="feedback-text" id="feedback-text"></div>
+    <div class="dsgvo-ref" id="dsgvo-ref"></div>
+    <button class="continue-btn" id="continue-btn" onclick="nextQuestion()">WEITER KÄMPFEN &#8594;</button>
+  </div>
+  <div class="lore-stone" id="lore-stone">&#8222;Nur wer das revDSG kennt, kann die Datendämonen besiegen.&#8220;</div>
+  <div class="campfire-hint">&#128293; Klicke auf &#129514; für einen Tipp &bull; 30 Sek. pro Frage &bull; 14/20 richtig = Sieg</div>
+</div>
+</div>
+
+<!-- DEATH SCREEN -->
+<div class="screen" id="death-screen">
+<div class="death-text">DU BIST TOT</div>
+<div class="death-subtitle">DATENSCHUTZ VERLETZT</div>
+<p class="death-lore" id="death-lore">Die Datendämonen haben triumphiert.</p>
+<div class="death-stats" id="death-stats"></div>
+<button class="retry-btn" onclick="showNameScreen()">&#9876;&#65039; NOCHMALS VERSUCHEN</button>
+<button class="retry-btn" style="border-color:var(--dim-gold);color:var(--dim-gold);" onclick="showLeaderboard()">&#127942; RANGLISTE</button>
+</div>
+
+<!-- VICTORY SCREEN -->
+<div class="screen" id="victory-screen">
+<img class="victory-logo-img" id="victory-logo" src="" alt="AdPrivacy">
+<div class="victory-text">DATENSCHUTZ-HELD!</div>
+<div class="victory-sub" id="v-title-sub">REVDSG-LEGENDE</div>
+<div class="victory-stats">
+  <div class="stat-row"><span>Richtige Antworten</span><span class="stat-value" id="v-correct">0/20</span></div>
+  <div class="stat-row"><span>Gesammelte Seelen</span><span class="stat-value" id="v-souls">0</span></div>
+  <div class="stat-row"><span>Titel</span><span class="stat-value" id="v-level">—</span></div>
+  <div class="stat-row"><span>Verwendete Hinweise</span><span class="stat-value" id="v-hints">0</span></div>
+</div>
+<p class="victory-quote">&#8222;Das Schweizer Datenschutzgesetz ist kein Hindernis — es ist dein Schwert.&#8220;</p>
+<p style="font-family:'Cinzel',serif;font-size:.68rem;color:var(--dim-gold);letter-spacing:.2em;margin-bottom:14px;">— AdPrivacy Consulting</p>
+<button class="play-again-btn" onclick="showLeaderboard()">&#127942; RANGLISTE</button>
+<button class="play-again-btn secondary" onclick="showNameScreen()">&#9876;&#65039; NOCHMAL SPIELEN</button>
+</div>
+
+<script>
+const LOGO_URL='https://raw.githubusercontent.com/Heene01/DSG-Souls/main/logo.png';
+
+const employeeScenarios=[
+{difficulty:1,level:"Ebene I",room:"Der Daten-Alltag",enemy:"📧",enemyName:"Der E-Mail-Dämon",tag:"Grundlagen",lore:"„Was du täglich nutzt, ist oft schützenswerter als du denkst.",
+scenario:"Deine Kollegin fragt: «Ist meine E-Mail-Adresse überhaupt ein Personendatum? Es ist doch nur eine Adresse.» Was antwortest du?",
+choices:[{text:"Nein — nur Name und AHV-Nummer sind Personendaten.",correct:false},{text:"Ja — eine E-Mail-Adresse ist ein Personendatum, weil sie einer Person zugeordnet werden kann.",correct:true},{text:"Nur wenn die E-Mail-Adresse den vollen Namen enthält.",correct:false},{text:"Nur bei beruflichen E-Mail-Adressen, nicht bei privaten.",correct:false}],
+successMsg:"⚔️ E-MAIL-DÄMON BESIEGT!",
+successText:"Richtig! Eine E-Mail-Adresse ist fast immer ein Personendatum — sie lässt sich einer Person zuordnen, besonders wenn sie Name oder Initialen enthält (z.B. max.muster@firma.ch). Im Datenschutz gilt: Wenn eine Information direkt oder indirekt auf eine Person schliessen lässt, ist sie ein Personendatum. Das gilt auch für IP-Adressen, Telefonnummern, Mitarbeiternummern oder Cookies.",
+failMsg:"☠️ PERSONENDATEN FALSCH ERKANNT!",
+failText:"Falsch! E-Mail-Adressen sind Personendaten — sie beziehen sich auf eine bestimmte Person. Das Schweizer Datenschutzgesetz schützt alle Informationen, die direkt oder indirekt auf eine natürliche Person schliessen lassen. Also auch E-Mails, Handynummern, IP-Adressen und sogar Mitarbeiternummern.",
+ref:"📜 revDSG Art. 5 lit. a: Personendaten — alle Informationen, die sich auf eine identifizierte oder identifizierbare Person beziehen."},
+
+{difficulty:1,level:"Ebene I",room:"Der offene Schreibtisch",enemy:"📋",enemyName:"Der Datenleck-Kobold",tag:"Büro-Alltag",lore:"„Ein leerer Schreibtisch ist kein leerer Kopf — aber eine leere Gefahr.",
+scenario:"Du gehst mittags zum Essen und lässt eine Kundenliste mit Namen, Adressen und Telefonnummern offen auf deinem Schreibtisch liegen. Was ist das Problem?",
+choices:[{text:"Kein Problem — die Kollegen sind vertrauenswürdig.",correct:false},{text:"Das ist eine Datenschutzverletzung — unbefugte Personen könnten die Daten einsehen.",correct:true},{text:"Nur ein Problem, wenn jemand die Liste fotografiert.",correct:false},{text:"Nur wenn es sich um sensitive Daten handelt.",correct:false}],
+successMsg:"⚔️ SCHREIBTISCH GESICHERT!",
+successText:"Richtig! Offenliegende Kundendaten sind ein klassisches Datenschutzproblem — selbst wenn die Kollegen vertrauenswürdig sind. Nicht jeder im Büro oder Besucher dürfen alle Daten sehen. Die Regel heisst «Clean Desk Policy»: Verlasse deinen Arbeitsplatz immer aufgeräumt, mit Dokumenten in abschliessbaren Schubladen oder verdeckt. Das gilt auch für Bildschirme: Sperr deinen Computer immer, wenn du aufstehst (Windows+L / Ctrl+Cmd+Q).",
+failMsg:"☠️ DATEN OFFEN WIE EIN BUCH!",
+failText:"Falsch! Auch vertrauenswürdige Kollegen dürfen nicht alle Daten einsehen — Datenschutz gilt auch intern. Ausserdem können Besucher, Reinigungspersonal oder andere Personen vorbeikommen. Die «Clean Desk Policy» ist eine wichtige organisatorische Massnahme: Dokumente wegsperren, Bildschirm sperren, Drucker leeren.",
+ref:"📜 revDSG Art. 7: Organisatorische Massnahmen — physischer Schutz von Personendaten, Clean Desk Policy."},
+
+{difficulty:1,level:"Ebene I",room:"Die Passwort-Kammer",enemy:"🔑",enemyName:"Der Passwort-Geist",tag:"IT-Sicherheit",lore:"„Ein geteiltes Passwort ist kein Passwort mehr.",
+scenario:"Dein Kollege ist krank und bittet dich per WhatsApp, mit seinem Passwort auf das Kundensystem zuzugreifen, weil er eine dringende Anfrage hat. Was machst du?",
+choices:[{text:"Ich logge mich mit seinem Passwort ein — es ist ja dringend.",correct:false},{text:"Ich lehne ab und informiere den Vorgesetzten oder IT, damit eine andere Lösung gefunden wird.",correct:true},{text:"Ich logge mich ein, aber nur kurz und nur für diese eine Sache.",correct:false},{text:"Es ist okay, wenn der Kollege sein Passwort selbst mitteilt.",correct:false}],
+successMsg:"⚔️ PASSWORT-GEIST ABGEWEHRT!",
+successText:"Richtig! Passwörter sind persönlich und dürfen nicht geteilt werden — auch nicht in dringenden Situationen. Der Grund: Wenn etwas schiefgeht, ist nicht mehr nachvollziehbar, wer tatsächlich gehandelt hat. Die IT-Abteilung kann in echten Notfällen temporäre Zugänge einrichten oder Vertretungsregelungen einsetzen. Das Teilen von Passwörtern ist in den meisten Unternehmen ein expliziter Verstoss gegen die IT-Richtlinien.",
+failMsg:"☠️ PASSWORT KOMPROMITTIERT!",
+failText:"Falsch! Passwörter sind niemals zu teilen — auch nicht in Notfällen und auch nicht wenn der Kollege selbst darum bittet. Der Grund ist Nachvollziehbarkeit: Logs zeigen dann, dass der Kollege aktiv war, obwohl du es warst. Kontaktiere stattdessen IT oder den Vorgesetzten für eine sichere Lösung.",
+ref:"📜 revDSG Art. 7 & IT-Richtlinien: Zugriffskontrollen — Passwörter sind persönlich, nicht teilbar, auch nicht vorübergehend."},
+
+{difficulty:1,level:"Ebene I",room:"Das Drucker-Verlies",enemy:"🖨️",enemyName:"Der Drucker-Troll",tag:"Büro-Alltag",lore:"„Was im Drucker vergessen wird, findet immer jemand.",
+scenario:"Du druckst eine Liste mit Mitarbeitersalären und vergisst, sie sofort am Drucker abzuholen. Eine Stunde später fällt es dir auf. Was ist zu tun?",
+choices:[{text:"Nichts — wahrscheinlich hat es niemand gesehen.",correct:false},{text:"Den Ausdruck sofort holen, prüfen ob jemand ihn gesehen hat, und den Vorfall dem Vorgesetzten melden.",correct:true},{text:"Einfach schreddern und vergessen.",correct:false},{text:"Nur melden, wenn jemand die Daten tatsächlich gelesen hat.",correct:false}],
+successMsg:"⚔️ DRUCKER-TROLL BESIEGT!",
+successText:"Richtig! Vergessene Ausdrucke mit sensiblen Daten — wie Lohndaten — sind ein meldepflichtiger Vorfall. Auch wenn wahrscheinlich niemand geschaut hat: Du weisst es nicht sicher. Das Unternehmen muss den Vorfall dokumentieren und einschätzen, ob Massnahmen nötig sind. Dokument sofort sichern und schreddern. In Zukunft: Drucker mit PIN-Druck verwenden, damit Dokumente erst beim Abholen gedruckt werden.",
+failMsg:"☠️ LOHNDATEN FREI ZUGÄNGLICH!",
+failText:"Falsch! Lohndaten sind besonders sensitive Informationen. Vergessene Ausdrucke müssen immer gemeldet werden — auch wenn wahrscheinlich niemand geschaut hat. Dein Unternehmen muss entscheiden, ob es ein meldepflichtiger Datenschutzvorfall ist. Einfach schreddern und schweigen ist nicht korrekt, weil der Vorfall nicht dokumentiert und bewertet wurde.",
+ref:"📜 revDSG Art. 24: Datenpannen melden — auch interne Vorfälle dokumentieren, auch wenn kein externer Schaden entstanden ist."},
+
+{difficulty:1,level:"Ebene II",room:"Die WhatsApp-Falle",enemy:"📱",enemyName:"Der Messenger-Dämon",tag:"Kommunikation",lore:"„Nicht jeder Kanal ist sicher genug für Personendaten.",
+scenario:"Ein Kunde schickt dir auf WhatsApp eine Kopie seines Ausweises als Foto, weil er seinen Vertrag abschliessen möchte. Was tust du?",
+choices:[{text:"Prima — ich speichere das Foto und leite es intern weiter.",correct:false},{text:"Ich erkläre dem Kunden, dass WhatsApp für sensitive Daten nicht geeignet ist, und bitte ihn, den Ausweis über den offiziellen sicheren Kanal zu senden.",correct:true},{text:"WhatsApp ist verschlüsselt — das ist völlig in Ordnung.",correct:false},{text:"Ich lösche das Foto sofort, ohne den Kunden zu informieren.",correct:false}],
+successMsg:"⚔️ MESSENGER-DÄMON GEBLOCKT!",
+successText:"Richtig! WhatsApp ist für die Übermittlung von Ausweiskopien ungeeignet — obwohl es Ende-zu-Ende-verschlüsselt ist, speichert WhatsApp Metadaten, Backups sind oft unverschlüsselt, und es gibt keine Kontrolle darüber, wo die Daten letztlich landen. Ausweiskopien sind sensitive Personendaten. Der Kunde muss höflich auf den richtigen, sicheren Kanal hingewiesen werden (verschlüsseltes Unternehmens-E-Mail, gesichertes Portal etc.).",
+failMsg:"☠️ AUSWEIS IM FALSCHEN KANAL!",
+failText:"Falsch! WhatsApp ist kein geeigneter Kanal für Ausweiskopien — auch wenn es verschlüsselt ist. Metadaten, Backups und fehlende Unternehmenskontrolle machen es unsicher für sensitive Personendaten. Dein Unternehmen hat wahrscheinlich vorgeschriebene Kanäle für solche Dokumente. Weise den Kunden freundlich darauf hin.",
+ref:"📜 revDSG Art. 7: Technische Massnahmen — geeignete Kanäle für sensitive Daten verwenden, Sicherheit bei der Übertragung gewährleisten."},
+
+{difficulty:1,level:"Ebene II",room:"Das Foto-Verlies",enemy:"📸",enemyName:"Der Selfie-Dämon",tag:"Social Media",lore:"„Was du fotografierst, nimmst du mit — auch ungewollt.",
+scenario:"Du machst ein Selfie im Büro für LinkedIn und im Hintergrund sieht man die Whiteboard-Notizen mit Kundennamen und Projekten. Was ist das Problem?",
+choices:[{text:"Kein Problem — es ist ja ein Selfie, nicht ein Foto der Daten.",correct:false},{text:"Das ist ein Datenschutzproblem — Kundendaten werden unabsichtlich öffentlich gemacht.",correct:true},{text:"Nur ein Problem, wenn Kunden das Foto sehen.",correct:false},{text:"Nur wenn die Kundennamen vollständig lesbar sind.",correct:false}],
+successMsg:"⚔️ SELFIE-DÄMON GESTOPPT!",
+successText:"Richtig! Hintergrundinformationen auf Fotos sind ein echtes Datenschutzrisiko. Kundennamen, Projekttitel, Telefonnummern oder andere sichtbare Daten im Hintergrund können auf Social Media für jeden sichtbar werden. Prüfe vor dem Posten immer den Hintergrund auf sichtbare Informationen. Das gilt auch für Video-Calls: Achte darauf, was hinter dir zu sehen ist.",
+failMsg:"☠️ DATEN IM HINTERGRUND SICHTBAR!",
+failText:"Falsch! Auch unabsichtlich veröffentlichte Daten im Hintergrund sind eine Datenschutzverletzung. Wenn Kundennamen oder Projektinfos auf LinkedIn sichtbar werden, verletzt das den Datenschutz dieser Personen — egal wie klein oder verschwommen die Schrift ist. Immer Hintergrund prüfen vor dem Posten!",
+ref:"📜 revDSG Art. 6: Grundsätze — unbeabsichtigte Bekanntgabe von Personendaten ist trotzdem eine Verletzung, auch über Social Media."},
+
+{difficulty:1,level:"Ebene II",room:"Die E-Mail-Katastrophe",enemy:"📨",enemyName:"Der CC-Dämon",tag:"E-Mail",lore:"„Ein falscher Klick und die Daten sind weg.",
+scenario:"Du willst einem Kunden seine Bestellbestätigung schicken und merkst danach, dass du aus Versehen die E-Mail an 50 andere Kunden mitgeschickt hast (alle im CC sichtbar). Was tust du?",
+choices:[{text:"Nichts tun und hoffen, dass es niemand merkt.",correct:false},{text:"Sofort den Vorgesetzten informieren, die betroffenen Kunden benachrichtigen und den Vorfall dokumentieren.",correct:true},{text:"Schnell eine Entschuldigungs-E-Mail senden und damit ist die Sache erledigt.",correct:false},{text:"Nur melden, wenn ein Kunde sich beschwert.",correct:false}],
+successMsg:"⚔️ CC-DÄMON UNTER KONTROLLE!",
+successText:"Richtig! Ein Massen-CC an alle Kunden ist ein klassischer Datenschutzvorfall — die E-Mail-Adressen aller Kunden werden gegenseitig sichtbar. Sofortmassnahmen: Vorgesetzten informieren, Vorfall dokumentieren, betroffene Kunden transparent informieren und sich entschuldigen. Das Unternehmen muss prüfen, ob es eine meldepflichtige Datenpanne ist. In Zukunft: BCC statt CC verwenden für Mehrfachempfänger.",
+failMsg:"☠️ 50 KUNDEN-E-MAILS OFFENGELEGT!",
+failText:"Falsch! E-Mail-Adressen sind Personendaten. Wenn alle 50 Kunden gegenseitig ihre E-Mails sehen können, ist das eine Datenschutzverletzung. Das muss gemeldet und dokumentiert werden — und die betroffenen Kunden haben ein Recht, informiert zu werden. Eine stille Entschuldigungs-Mail reicht nicht aus.",
+ref:"📜 revDSG Art. 24: Datenpannen — auch versehentliche E-Mail-Pannen sind zu melden und zu dokumentieren. BCC statt CC verwenden."},
+
+{difficulty:2,level:"Ebene III",room:"Das Mitarbeiter-Gespräch",enemy:"👥",enemyName:"Der Klatsch-Kobold",tag:"Interne Daten",lore:"„Was du über Kollegen weisst, gehört nicht allen.",
+scenario:"Deine Kollegin fragt dich: «Weisst du, warum Stefan krankgeschrieben ist? Ich habe gehört, es ist etwas Ernstes.» Was antwortest du?",
+choices:[{text:"Ich erzähle, was ich weiss — wir sind schliesslich ein Team.",correct:false},{text:"Ich sage, dass Gesundheitsdaten von Kollegen vertraulich sind und ich darüber nicht sprechen darf.",correct:true},{text:"Ich sage nur, dass er krank ist — nicht warum.",correct:false},{text:"Ich frage die HR-Abteilung nach und teile die Info dann mit der Kollegin.",correct:false}],
+successMsg:"⚔️ KLATSCH-KOBOLD ABGEWIESEN!",
+successText:"Richtig! Gesundheitsdaten sind besonders schützenswerte Personendaten — auch von Kollegen. Du darfst keine Informationen über den Gesundheitszustand von Mitarbeitenden weitergeben, selbst wenn du etwas weisst. Auch «er ist wegen seinem Rücken» ist zu viel. Die richtige Antwort: «Das ist seine Privatsache.» Gleiches gilt für andere sensitive Informationen über Kollegen wie Lohn, Familiensituation oder Probleme.",
+failMsg:"☠️ GESUNDHEITSDATEN WEITERGEGEBEN!",
+failText:"Falsch! Gesundheitsdaten sind nach revDSG besonders schützenswert — und das gilt auch für Kollegen. Selbst «nur» zu sagen, es sei etwas Ernstes, ist eine unzulässige Weitergabe von sensitiven Personendaten. Keine Informationen über den Gesundheitszustand von Kollegen weitergeben — auch nicht an enge Teamkollegen.",
+ref:"📜 revDSG Art. 5 lit. c: Gesundheitsdaten sind besonders schützenswert — auch von Mitarbeitenden, keine Weitergabe ohne Einwilligung."},
+
+{difficulty:2,level:"Ebene III",room:"Das Home-Office-Dilemma",enemy:"🏠",enemyName:"Der Homeoffice-Spion",tag:"Homeoffice",lore:"„Zuhause ist nicht ausserhalb des Datenschutzes.",
+scenario:"Du arbeitest im Homeoffice und dein Partner fragt, ob er kurz deinen Firmen-Laptop nutzen darf, um etwas zu drucken. Was sagst du?",
+choices:[{text:"Klar — er druckt ja nur etwas, er schaut sich nichts an.",correct:false},{text:"Nein — der Firmen-Laptop darf nur von dir genutzt werden, Privatpersonen haben darauf keinen Zugriff.",correct:true},{text:"Nur wenn er nichts im Browser anschaut.",correct:false},{text:"Ich logge mich aus, dann kann er ihn nutzen.",correct:false}],
+successMsg:"⚔️ HOMEOFFICE-SPION ABGEWEHRT!",
+successText:"Richtig! Firmen-Laptops sind ausschliesslich für autorisierte Mitarbeitende. Auch wenn dein Partner nur drucken möchte — er könnte versehentlich auf Firmendaten, E-Mails oder Kundendaten stossen. Zudem gelten die IT-Richtlinien des Unternehmens für alle Aktivitäten auf dem Gerät. Im Homeoffice gilt: Gerät = nur für dich. Bildschirm nicht für Familienmitglieder sichtbar lassen, Sitzung immer sperren.",
+failMsg:"☠️ FIRMENDATEN IM PRIVATHAUSHALT!",
+failText:"Falsch! Firmen-Laptops dürfen ausschliesslich von autorisierten Mitarbeitenden benutzt werden — auch zuhause. Dein Partner könnte versehentlich E-Mails, Kundendaten oder andere vertrauliche Informationen sehen. Das wäre eine Datenschutzverletzung. Biete deinem Partner deinen Privat-Computer oder ein anderes Gerät an.",
+ref:"📜 revDSG Art. 7: Technische und organisatorische Massnahmen — Zugriffskontrollen gelten auch im Homeoffice, Firmengeräte nur für autorisierte Nutzer."},
+
+{difficulty:2,level:"Ebene III",room:"Die Kundenanfrage-Kammer",enemy:"🔍",enemyName:"Der Neugier-Dämon",tag:"Auskunftsrecht",lore:"„Kunden dürfen fragen — und du musst wissen, was zu tun ist.",
+scenario:"Ein Kunde ruft an und sagt: «Ich möchte wissen, welche Daten ihr über mich gespeichert habt.» Was tust du?",
+choices:[{text:"Ich sage: «Das kann ich nicht herausgeben.»",correct:false},{text:"Ich erkläre dem Kunden sein Auskunftsrecht und leite seine Anfrage an die zuständige Stelle (Datenschutzverantwortlicher / HR) weiter.",correct:true},{text:"Ich schaue selbst nach und lese ihm alles vor.",correct:false},{text:"Ich frage ihn, warum er das wissen möchte, bevor ich entscheide.",correct:false}],
+successMsg:"⚔️ NEUGIER-DÄMON KORREKT BEHANDELT!",
+successText:"Richtig! Jede Person hat das Recht zu wissen, welche Daten über sie gespeichert sind — das ist das Auskunftsrecht nach revDSG Art. 25. Als Mitarbeiter ist deine Aufgabe: die Anfrage ernst nehmen, den Kunden informieren und die Anfrage an die zuständige Stelle weiterleiten (Datenschutzbeauftragter, Rechtsabteilung oder Vorgesetzter). Nicht selbst entscheiden oder ablehnen — und nicht einfach selbst Daten herausgeben ohne Prüfung.",
+failMsg:"☠️ AUSKUNFTSRECHT VERLETZT!",
+failText:"Falsch! Das Auskunftsrecht ist ein gesetzliches Recht — du kannst es nicht einfach ablehnen oder ignorieren. Als Mitarbeiter leitest du die Anfrage an die zuständige Stelle weiter, die dann korrekt und vollständig antworten kann. Selbst Daten vorlesen ist auch nicht ideal — es braucht eine strukturierte, geprüfte Antwort.",
+ref:"📜 revDSG Art. 25: Auskunftsrecht — jede Person kann verlangen zu wissen, welche Daten gespeichert sind. Anfragen korrekt weiterleiten."},
+
+{difficulty:2,level:"Ebene III",room:"Der USB-Stick-Abgrund",enemy:"💾",enemyName:"Der USB-Kobold",tag:"IT-Sicherheit",lore:"„Fremde Sticks können trojanische Pferde sein.",
+scenario:"Du findest auf dem Parkplatz einen USB-Stick mit dem Aufkleber «Lohnliste 2024». Was machst du?",
+choices:[{text:"Ich stecke ihn in meinen Firmen-Laptop, um zu schauen, wem er gehört.",correct:false},{text:"Ich gebe ihn unangesteckt an die IT-Abteilung ab und informiere meinen Vorgesetzten.",correct:true},{text:"Ich stecke ihn in meinen privaten Laptop — das ist sicherer.",correct:false},{text:"Ich werfe ihn weg — damit niemand die Lohndaten findet.",correct:false}],
+successMsg:"⚔️ USB-KOBOLD ENTSCHÄRFT!",
+successText:"Richtig! Unbekannte USB-Sticks niemals einstecken — weder in Firmen- noch in Privatgeräte. USB-Sticks können Schadsoftware enthalten, die beim Einstecken automatisch ausgeführt wird (sogenannte «BadUSB»-Angriffe). An die IT abgeben, die kann den Stick sicher prüfen. Ausserdem: Wenn der Stick tatsächlich Lohndaten enthält, ist das ein Datenschutzvorfall, der gemeldet werden muss.",
+failMsg:"☠️ SCHADSOFTWARE IM NETZWERK!",
+failText:"Falsch! Unbekannte USB-Sticks sind ein klassisches Einfallstor für Schadsoftware. Selbst auf privaten Geräten kann das gefährlich sein. Niemals einstecken — immer unangesteckt an die IT-Abteilung abgeben. Die IT kann den Inhalt sicher prüfen und wenn nötig den Datenschutzvorfall melden.",
+ref:"📜 revDSG Art. 7 & IT-Sicherheit: Technische Massnahmen — unbekannte Datenträger niemals verwenden, IT-Abteilung einschalten."},
+
+{difficulty:2,level:"Ebene IV",room:"Das Vertragsschluss-Verlies",enemy:"📝",enemyName:"Der Formulare-Fürst",tag:"Datenerhebung",lore:"„Nicht alle Daten, die man haben kann, darf man auch erheben.",
+scenario:"Beim Abschluss eines Mobilfunkvertrags fragt das System nach Religionszugehörigkeit und politischer Partei des Kunden. Dein Vorgesetzter sagt: «Füll einfach aus.» Was tust du?",
+choices:[{text:"Ich fülle alles aus — der Vorgesetzte hat es gesagt.",correct:false},{text:"Ich hinterfrage das intern und weise darauf hin, dass diese Daten für einen Mobilfunkvertrag nicht notwendig sind.",correct:true},{text:"Ich lasse die Felder leer, ohne etwas zu sagen.",correct:false},{text:"Ich frage den Kunden, ob er die Infos freiwillig angeben möchte.",correct:false}],
+successMsg:"⚔️ FORMULARE-FÜRST GEBREMST!",
+successText:"Richtig! Religionszugehörigkeit und politische Ansichten sind besonders schützenswerte Personendaten — und für einen Mobilfunkvertrag schlicht nicht notwendig. Das Verhältnismässigkeitsprinzip verbietet es, mehr Daten zu erheben als nötig. Als Mitarbeiter hast du nicht nur das Recht, sondern die Pflicht, auf solche Probleme hinzuweisen — intern, beim Vorgesetzten oder beim Datenschutzbeauftragten. «Der Chef hat es gesagt» schützt nicht vor Mitverantwortung.",
+failMsg:"☠️ UNNÖTIGE SENSITIVE DATEN ERHOBEN!",
+failText:"Falsch! Kein Auftrag des Vorgesetzten legitimiert die Erhebung unnötiger sensitiver Daten. Religionszugehörigkeit und politische Partei sind besonders schützenswert und für einen Mobilfunkvertrag irrelevant. Als Mitarbeiter kannst du intern eskalieren — beim Datenschutzbeauftragten oder Vorgesetzten. Das Datenschutzrecht gilt unabhängig von internen Anweisungen.",
+ref:"📜 revDSG Art. 6 Abs. 2 & Art. 5 lit. c: Verhältnismässigkeit — nur notwendige Daten erheben. Sensitive Daten brauchen besondere Rechtfertigung."},
+
+{difficulty:2,level:"Ebene IV",room:"Das Bewerbungs-Labyrinth",enemy:"📄",enemyName:"Der HR-Kobold",tag:"Recruiting",lore:"„Bewerber sind keine Datenpakete — auch nicht nach der Absage.",
+scenario:"Du arbeitest in der HR und behältst alle Bewerbungsunterlagen abgelehnter Kandidaten «für später» unbegrenzt im System. Was ist das Problem?",
+choices:[{text:"Kein Problem — vielleicht brauchen wir sie mal.",correct:false},{text:"Bewerbungsunterlagen müssen nach dem Ende des Verfahrens gelöscht werden, ausser der Kandidat stimmt explizit einer längeren Speicherung zu.",correct:true},{text:"Nur ein Problem, wenn die Kandidaten aktiv nach Löschung fragen.",correct:false},{text:"Erlaubt, solange die Daten sicher gespeichert sind.",correct:false}],
+successMsg:"⚔️ HR-KOBOLD GEBÄNDIGT!",
+successText:"Richtig! Bewerbungsunterlagen sind Personendaten und dürfen nur so lange gespeichert werden, wie es der Zweck erfordert — also das Bewerbungsverfahren. Nach der Absage müssen die Unterlagen gelöscht werden, in der Praxis meist nach 3-6 Monaten (für allfällige Rechtsstreitigkeiten). Möchte das Unternehmen die Daten länger behalten (Talentpool), braucht es die ausdrückliche Einwilligung des Kandidaten.",
+failMsg:"☠️ BEWERBERDATEN OHNE ZWECK GESPEICHERT!",
+failText:"Falsch! «Vielleicht brauchen wir sie mal» ist kein gültiger Zweck. Das Zweckbindungsprinzip verlangt, dass Daten nach Wegfall des Zwecks gelöscht werden. Bei Bewerbungen: Nach Abschluss des Verfahrens löschen, mit kurzer Aufbewahrungsfrist für Rechtsstreitigkeiten. Für einen Talentpool braucht es die explizite Einwilligung.",
+ref:"📜 revDSG Art. 6 Abs. 3: Zweckbindung — Bewerbungsunterlagen nach Verfahrensende löschen oder Einwilligung für Talentpool einholen."},
+
+{difficulty:2,level:"Ebene IV",room:"Der Kunden-Chat",enemy:"💬",enemyName:"Der Chat-Dämon",tag:"Kommunikation",lore:"„Was in Chats gesagt wird, bleibt — länger als du denkst.",
+scenario:"Ein Kollege sendet dir im Firmen-Chat (Teams/Slack) Kundendaten aus Versehen an die falsche Person innerhalb der Firma. Was ist zu tun?",
+choices:[{text:"Der Kollege soll die Nachricht löschen — dann ist es erledigt.",correct:false},{text:"Den Vorfall dem Vorgesetzten oder Datenschutzbeauftragten melden — auch interne Datenpannen müssen dokumentiert werden.",correct:true},{text:"Nichts — es war ja intern, nicht extern.",correct:false},{text:"Die empfangende Person bitten, die Daten zu ignorieren.",correct:false}],
+successMsg:"⚔️ CHAT-DÄMON UNTER KONTROLLE!",
+successText:"Richtig! Auch interne Datenpannen müssen gemeldet und dokumentiert werden. Selbst wenn die Daten «nur» an eine falsche interne Person gingen: Sie hatte kein Recht, diese Daten zu sehen. Der Vorfall muss gemeldet werden, damit das Unternehmen einschätzen kann, ob Massnahmen nötig sind. Das Löschen der Nachricht ändert nichts — die Person hat die Daten bereits gesehen.",
+failMsg:"☠️ INTERNE DATENPANNE VERTUSCHT!",
+failText:"Falsch! Interne Datenpannen sind trotzdem Datenpannen. Das Löschen der Nachricht ändert nichts daran, dass eine unbefugte Person die Daten gesehen hat. Der Vorfall muss dokumentiert und gemeldet werden. Das Unternehmen entscheidet dann, ob und welche Massnahmen nötig sind.",
+ref:"📜 revDSG Art. 24: Datenpannen — auch interne Vorfälle dokumentieren und melden, Datenschutzbeauftragten einschalten."},
+
+{difficulty:3,level:"Ebene V",room:"Die Einwilligungs-Prüfkammer",enemy:"✅",enemyName:"Der Consent-Wächter",tag:"Einwilligung",lore:"„Ja heisst Ja — aber nicht immer und nicht für immer.",
+scenario:"Ein Kunde hat vor 5 Jahren eingewilligt, Marketingnachrichten zu erhalten. Seitdem hat er sich nie gemeldet. Darf das Unternehmen ihn weiterhin kontaktieren?",
+choices:[{text:"Ja — er hat einmal eingewilligt, das gilt für immer.",correct:false},{text:"Es kommt drauf an: Einwilligungen können widerrufen werden und sollten periodisch überprüft werden — besonders nach langen Zeiträumen.",correct:true},{text:"Ja — solange er sich nicht aktiv abmeldet.",correct:false},{text:"Nein — Einwilligungen gelten maximal 1 Jahr.",correct:false}],
+successMsg:"⚔️ CONSENT-WÄCHTER ZUFRIEDEN!",
+successText:"Richtig! Eine Einwilligung gilt nicht ewig. Sie kann jederzeit widerrufen werden und das Unternehmen muss dies respektieren. Bei sehr alten Einwilligungen (5+ Jahre ohne Interaktion) empfiehlt es sich aus Best-Practice-Sicht, die Einwilligung zu erneuern — auch wenn das Gesetz keine starre Frist nennt. Zudem muss die Einwilligung für den aktuellen Zweck noch gültig sein. Im E-Mail-Marketing: Immer einen gut sichtbaren Abmelde-Link einbauen.",
+failMsg:"☠️ VERALTETE EINWILLIGUNG!",
+failText:"Falsch! Einwilligungen gelten nicht ewig und können jederzeit widerrufen werden. Bei 5 Jahren ohne Interaktion sollte das Unternehmen die Einwilligung erneuern. Ausserdem: Wenn sich die Art der Kommunikation oder der Zweck geändert hat, braucht es eine neue Einwilligung. Immer Abmeldeoption anbieten.",
+ref:"📜 revDSG Art. 6 Abs. 6: Einwilligung — jederzeit widerrufbar, periodische Überprüfung empfohlen, Zweckbindung beachten."},
+
+{difficulty:3,level:"Ebene V",room:"Das Foto-Einverständnis-Schloss",enemy:"📷",enemyName:"Der Foto-Fürst",tag:"Bilder & Videos",lore:"„Ein Foto von jemandem ist ein Personendatum — mit oder ohne Namen.",
+scenario:"Am Firmenevent werden Fotos gemacht und anschliessend auf der Unternehmens-Website publiziert. Ein Mitarbeiter sieht sich auf einem Foto und möchte es entfernen lassen. Was gilt?",
+choices:[{text:"Er hat Pech — er war am Event, das ist Einwilligung.",correct:false},{text:"Er hat das Recht, die Löschung zu verlangen, und das Unternehmen muss das Foto entfernen.",correct:true},{text:"Nur wenn er explizit vor dem Event Nein gesagt hat.",correct:false},{text:"Nur wenn das Foto schmeichelhaft ist, darf man es behalten.",correct:false}],
+successMsg:"⚔️ FOTO-FÜRST BESIEGT!",
+successText:"Richtig! Fotos von Personen sind Personendaten. Die blosse Teilnahme an einem Event ist keine Einwilligung zur Veröffentlichung von Bildern. Unternehmen sollten vor dem Event explizit um Einwilligung bitten — und der Mitarbeiter hat das Recht, die Löschung zu verlangen, auch nachträglich. Praxis-Tipp: Event-Einladungen mit Hinweis auf Fotografie und Einwilligungsformular kombinieren.",
+failMsg:"☠️ FOTOS OHNE EINWILLIGUNG PUBLIZIERT!",
+failText:"Falsch! Die Teilnahme an einem Event bedeutet nicht automatisch Einwilligung zur Veröffentlichung von Fotos. Das Unternehmen braucht eine explizite Einwilligung. Wenn jemand nachträglich die Löschung verlangt, muss das Foto entfernt werden. Fotos sind Personendaten und unterliegen dem Datenschutz.",
+ref:"📜 revDSG Art. 6 & Art. 32: Fotos als Personendaten — Einwilligung nötig für Publikation, Recht auf Löschung auf Verlangen."},
+
+{difficulty:3,level:"Ebene V — Endboss",room:"Der Vorfall-Thron",enemy:"🚨",enemyName:"Der Incident-König",tag:"Datenpanne",lore:"„Was tust du, wenn der schlimmste Fall eintritt?",
+scenario:"Du bemerkst, dass dein Laptop gestohlen wurde und darauf unverschlüsselt Kundendaten gespeichert sind. Was sind deine ersten Schritte?",
+choices:[{text:"Warten, ob der Laptop wieder auftaucht, bevor ich Alarm schlage.",correct:false},{text:"Sofort IT und Vorgesetzten informieren, den Laptop sperren lassen und den Vorfall dokumentieren.",correct:true},{text:"Selbst versuchen, den Laptop remote zu löschen.",correct:false},{text:"Nur Anzeige bei der Polizei erstatten, alles andere regelt sich selbst.",correct:false}],
+successMsg:"🏆 INCIDENT-KÖNIG BESIEGT! DATENSCHUTZ-HELD!",
+successText:"Perfekt! Bei einem gestohlenen Laptop mit Kundendaten ist schnelles Handeln entscheidend: Sofort IT informieren (Laptop remote sperren/löschen lassen), Vorgesetzten und Datenschutzbeauftragten einschalten, Vorfall dokumentieren. Das Unternehmen muss dann prüfen, ob eine Meldepflicht an den EDÖB besteht. Je schneller gehandelt wird, desto mehr Schaden kann begrenzt werden. Niemals alleine handeln oder abwarten!",
+failMsg:"☠️ ZU LANGSAM REAGIERT!",
+failText:"Falsch! Bei einem Datenschutzvorfall zählt jede Stunde. Sofort IT und Vorgesetzten informieren — die können den Laptop remote sperren und löschen. Warten ist das Schlimmste: Die Daten könnten bereits kopiert werden. Das Unternehmen entscheidet dann über weitere Schritte (EDÖB-Meldung, Kundeninformation). Polizei ja — aber erst nach den internen Sofortmassnahmen.",
+ref:"📜 revDSG Art. 24 & IT-Sicherheit: Datenpannen — sofort melden, IT einschalten, dokumentieren, Meldepflicht prüfen."}
+
+{difficulty:3,level:"Ebene V",room:"Der Auftragsverarbeitungs-Test",enemy:"🤝",enemyName:"Der Vertrags-Wächter",tag:"Dienstleister",lore:"„Nicht jeder, der Daten bearbeitet, ist auch dafür verantwortlich.",
+scenario:"Deine Firma nutzt eine externe Cloud-Software für die Kundenverwaltung. Wer trägt die Verantwortung für den Datenschutz?",
+choices:[{text:"Der Cloud-Anbieter — er speichert die Daten.",correct:false},{text:"Deine Firma — sie entscheidet über Zweck und Mittel der Datenbearbeitung und bleibt verantwortlich.",correct:true},{text:"Beide gleichwertig — es gibt keine klare Verantwortung.",correct:false},{text:"Niemand — Cloud ist international und nicht reguliert.",correct:false}],
+successMsg:"⚔️ VERTRAGS-WÄCHTER ZUFRIEDEN!",
+successText:"Richtig! Auch wenn ein externer Anbieter die Daten technisch speichert, bleibt deine Firma die datenschutzrechtlich Verantwortliche — sie entscheidet, warum und wie Kundendaten verarbeitet werden. Der Cloud-Anbieter ist ein «Auftragsbearbeiter» und muss vertraglich verpflichtet werden. Wenn etwas schiefgeht, steht deine Firma in der Pflicht. Deshalb ist es wichtig, dass IT und Rechtsabteilung jeden Cloud-Dienst prüfen, bevor er eingesetzt wird.",
+failMsg:"☠️ VERANTWORTUNG FALSCH ZUGEORDNET!",
+failText:"Falsch! Der Cloud-Anbieter verarbeitet die Daten nur im Auftrag — verantwortlich bleibt deine Firma. Das bedeutet: Deine Firma muss sicherstellen, dass der Anbieter Datenschutz einhält, und einen Auftragsbearbeitungsvertrag abschliessen. Neue Cloud-Dienste immer durch IT und ggf. Datenschutzbeauftragten prüfen lassen, bevor sie produktiv genutzt werden.",
+ref:"📜 revDSG Art. 9: Auftragsbearbeitung — der Auftraggeber bleibt datenschutzrechtlich verantwortlich, auch bei externen Dienstleistern."},
+
+{difficulty:3,level:"Ebene V",room:"Das Datenlösch-Ritual",enemy:"🗑️",enemyName:"Der Lösch-Fürst",tag:"Datenlöschung",lore:"„Löschen heisst löschen — nicht archivieren.",
+scenario:"Du sollst alte Kundendaten löschen. Du verschiebst sie stattdessen in einen Archiv-Ordner «nur für den Fall». Ist das datenschutzkonform?",
+choices:[{text:"Ja — sie sind ja im Archiv, nicht mehr im aktiven System.",correct:false},{text:"Nein — archivieren ist nicht löschen. Wenn Daten gelöscht werden sollen, müssen sie wirklich gelöscht werden.",correct:true},{text:"Ja, solange der Archiv-Ordner passwortgeschützt ist.",correct:false},{text:"Nur wenn das Archiv auf einem lokalen Server liegt.",correct:false}],
+successMsg:"⚔️ LÖSCH-FÜRST RESPEKTIERT!",
+successText:"Richtig! Archivieren ist kein Löschen. Wenn Daten aufgrund von Zweckwegfall oder Löschanfragen entfernt werden müssen, muss das wirklich geschehen — nicht nur verschoben oder versteckt. «Für den Fall»-Archivierung ist juristisch problematisch, weil kein legitimer Zweck vorliegt. Ausnahme: gesetzliche Aufbewahrungspflichten — dann ist Aufbewahrung Pflicht, aber klar geregelt und befristet, nicht «irgendwo im Archiv».",
+failMsg:"☠️ FALSCHES LÖSCHEN!",
+failText:"Falsch! Ein Archiv-Ordner ist kein Datenlöschen — die Daten sind weiterhin vorhanden und zugänglich. Wenn Daten gelöscht werden müssen, müssen sie wirklich vernichtet werden (sicheres Löschen, Schreddern). Archivieren ist nur erlaubt, wenn eine gesetzliche Aufbewahrungspflicht besteht — und auch dann ist der Zweck klar definiert und befristet.",
+ref:"📜 revDSG Art. 6 Abs. 3: Zweckbindung — nach Wegfall des Zwecks wirklich löschen, nicht nur verschieben oder archivieren ohne Rechtfertigung."},
+
+{difficulty:3,level:"Ebene V",room:"Die Phishing-Falle",enemy:"🎣",enemyName:"Der Phishing-Fürst",tag:"IT-Sicherheit",lore:"„Nicht alles, was offiziell aussieht, ist auch offiziell.",
+scenario:"Du erhältst eine E-Mail von «it-support@dein-unternehmen-helpdesk.com» mit der Bitte, dein Passwort zu bestätigen — sonst wird dein Konto gesperrt. Was tust du?",
+choices:[{text:"Ich gebe mein Passwort ein — es sieht offiziell aus.",correct:false},{text:"Ich ignoriere die E-Mail und melde sie der IT-Abteilung als Phishing-Versuch.",correct:true},{text:"Ich ändere nur vorsorglich mein Passwort auf der verlinkten Seite.",correct:false},{text:"Ich antworte und frage, ob die E-Mail echt ist.",correct:false}],
+successMsg:"⚔️ PHISHING-FÜRST ENTLARVT!",
+successText:"Richtig! Phishing-E-Mails sind eine der häufigsten Ursachen für Datenschutzverletzungen. Merkmale: ungewöhnliche Absenderadresse (helpdesk statt offizielle Domain), Dringlichkeit («sonst gesperrt»), Passwortabfrage per E-Mail. IT-Abteilungen fragen niemals per E-Mail nach Passwörtern. Immer: E-Mail melden, nicht klicken, nicht antworten. Im Zweifel direkt bei IT anrufen — nicht auf die E-Mail-Adresse antworten.",
+failMsg:"☠️ PHISHING ERFOLGREICH!",
+failText:"Falsch! Das ist ein klassischer Phishing-Versuch. Die Absenderadresse ist nicht die offizielle Unternehmens-Domain. IT-Abteilungen fragen niemals per E-Mail nach Passwörtern. Auf der verlinkten Seite das Passwort eingeben wäre fatal — du gibst es direkt an Angreifer. Sofort der IT melden, nicht antworten, nicht klicken.",
+ref:"📜 revDSG Art. 7 & IT-Sicherheit: Technische und organisatorische Massnahmen — Phishing-Erkennung, Meldepflicht bei Verdacht, keine Passwort-Weitergabe."}
+
+];
+
+const scenarios=[
+// ===== SCHWIERIGKEIT 1: Grundlagen =====
+{difficulty:1,level:"Ebene I",room:"Die Einwilligungs-Kammer",enemy:"👹",enemyName:"Der Einwilligungs-Dämon",tag:"revDSG Art. 6",lore:"„Ohne Einwilligung kein Datenfluss — doch es gibt Ausnahmen.",
+scenario:"Ein Schweizer Onlineshop möchte Kundendaten für Newsletter nutzen. Der Datenschutzbeauftragte sagt: «Beim Checkout reicht ein vorausgewähltes Kästchen.» Stimmt das nach dem revDSG?",
+choices:[{text:"Ja — vorausgewählte Kästchen sind in der Schweiz zulässig.",correct:false},{text:"Nein — die Einwilligung muss freiwillig, informiert und unmissverständlich sein. Vorausgefüllte Felder genügen nicht.",correct:true},{text:"Ja — solange der Kunde das Feld deaktivieren kann.",correct:false},{text:"Nein — Newsletter brauchen gar keine Einwilligung.",correct:false}],
+successMsg:"⚔️ EINWILLIGUNGS-DÄMON BESIEGT!",
+successText:"Korrekt! Das revDSG verlangt in Art. 6 Abs. 6 eine ausdrückliche, freiwillige und informierte Einwilligung. Vorausgefüllte Checkboxen sind ein sogenanntes «Dark Pattern» — sie täuschen eine Zustimmung vor, die nicht aktiv gegeben wurde. Die betroffene Person muss bewusst und aktiv handeln, z.B. durch Anklicken eines leeren Feldes. Zudem muss die Einwilligung spezifisch sein: Eine Generaleinwilligung für alle möglichen Nutzungen reicht nicht.",
+failMsg:"☠️ DER DÄMON VERFÜHRT DICH!",
+failText:"Falsch! Vorausgefüllte Kästchen gelten nicht als gültige Einwilligung, weil keine aktive Handlung der betroffenen Person vorliegt. Das revDSG verlangt eine ausdrückliche Zustimmung — das bedeutet: leeres Feld, aktives Anklicken, kein Druck. Passivität oder Vorauswahl zählt nicht. Unternehmen, die trotzdem so vorgehen, riskieren Sanktionen nach Art. 60 ff. revDSG.",
+ref:"📜 revDSG Art. 6 Abs. 6 & Art. 19: Einwilligung muss freiwillig, ausdrücklich und informiert sein. Dark Patterns sind unzulässig."},
+
+{difficulty:1,level:"Ebene I",room:"Das Auskunftsrecht-Labyrinth",enemy:"🕵️",enemyName:"Der Auskunfts-Geist",tag:"revDSG Art. 25",lore:"„Wer fragt, hat ein Recht auf Antwort — doch die Frist ist eng.",
+scenario:"Ein Mitarbeiter stellt am 1. März eine Auskunftsanfrage über seine gespeicherten Personendaten. Bis wann muss das Unternehmen antworten?",
+choices:[{text:"Innerhalb von 30 Tagen.",correct:true},{text:"Innerhalb von 60 Tagen.",correct:false},{text:"Innerhalb von 3 Monaten.",correct:false},{text:"Es gibt keine gesetzliche Frist im revDSG.",correct:false}],
+successMsg:"⚔️ DER AUSKUNFTS-GEIST IST GEBUNDEN!",
+successText:"Richtig! Gemäss revDSG Art. 25 muss die Auskunft in der Regel innert 30 Tagen erteilt werden. In begründeten Ausnahmefällen — z.B. bei sehr umfangreichen Anfragen — kann die Frist verlängert werden, aber die betroffene Person muss darüber informiert werden. Die Auskunft muss kostenlos sein und alle bearbeiteten Daten, deren Herkunft, den Zweck sowie allfällige Empfänger umfassen. Verweigert das Unternehmen die Auskunft unbegründet, kann der EDÖB eingeschaltet werden.",
+failMsg:"☠️ DU VERLETZT DAS AUSKUNFTSRECHT!",
+failText:"Falsch! Das revDSG sieht in Art. 25 eine Frist von 30 Tagen vor — nicht 60 Tage, nicht 3 Monate. Diese Frist ist bewusst kurz gehalten, um dem Grundsatz der Transparenz Nachachtung zu verschaffen. Im Vergleich: Die EU-DSGVO kennt ebenfalls 30 Tage (Art. 12 DSGVO). Wichtig: Die Auskunft muss grundsätzlich kostenlos erfolgen. Nur bei offensichtlich unbegründeten oder exzessiven Anfragen kann eine Gebühr verlangt werden.",
+ref:"📜 revDSG Art. 25: Auskunftsrecht — Antwort innert 30 Tagen, kostenlos, schriftlich oder in elektronischer Form."},
+
+{difficulty:1,level:"Ebene I",room:"Das Privacy-by-Design-Labyrinth",enemy:"🏗️",enemyName:"Der Architektur-Golem",tag:"revDSG Art. 7",lore:"„Datenschutz beginnt am Reissbrett, nicht im Anwaltsbüro.",
+scenario:"Ein Entwickler erstellt eine neue App. Sein Chef sagt: «Datenschutz klären wir kurz vor dem Launch.» Was ist die korrekte Haltung nach revDSG?",
+choices:[{text:"Der Chef hat Recht — Datenschutz ist ein Launch-Thema.",correct:false},{text:"Datenschutz muss von Anfang an in der Designphase berücksichtigt werden (Privacy by Design & Default).",correct:true},{text:"Datenschutz ist nur relevant, wenn die App Gesundheitsdaten verarbeitet.",correct:false},{text:"Erst wenn der EDÖB nachfragt, muss gehandelt werden.",correct:false}],
+successMsg:"⚔️ ARCHITEKTUR-GOLEM DOMESTIZIERT!",
+successText:"Richtig! Das revDSG schreibt in Art. 7 «Privacy by Design» und «Privacy by Default» ausdrücklich vor. Privacy by Design bedeutet: Datenschutz wird von Anfang an in die Systemarchitektur eingebaut — nicht als Anhang. Privacy by Default heisst: Die datenschutzfreundlichste Einstellung ist die Standardeinstellung. Konkret: Datenminimierung bereits beim Datenmodell, keine unnötigen Felder, Zugriffskontrollen von Beginn an. Nachträgliche Korrekturen sind teuer und oft unvollständig.",
+failMsg:"☠️ DAS FUNDAMENT IST FAUL!",
+failText:"Falsch! Datenschutz nachträglich einzubauen ist wie eine Feuermauer nach dem Brand zu errichten. Das revDSG Art. 7 verpflichtet Verantwortliche ausdrücklich, technische und organisatorische Massnahmen bereits bei der Planung umzusetzen. «Privacy by Default» bedeutet zusätzlich: Ohne Zutun der Nutzenden dürfen nur die minimal notwendigen Daten verarbeitet werden. Wer das ignoriert, riskiert nicht nur Sanktionen, sondern auch erhebliche Nachbesserungskosten.",
+ref:"📜 revDSG Art. 7: Privacy by Design — Datenschutzmassnahmen bei Konzeption einbauen. Privacy by Default — datenschutzfreundlichste Einstellung als Standard."},
+
+{difficulty:1,level:"Ebene I",room:"Das Besondere-Daten-Verlies",enemy:"🏥",enemyName:"Der Sensitiv-Fürst",tag:"revDSG Art. 5 lit. c",lore:"„Nicht alle Daten sind gleich — manche verdienen besonderen Schutz.",
+scenario:"Welche der folgenden Datenkategorien gilt nach revDSG als «besonders schützenswert»?",
+choices:[{text:"Nur biometrische Daten.",correct:false},{text:"Gesundheitsdaten, Religionszugehörigkeit, politische Ansichten, Sozialhilfe, genetische und biometrische Daten.",correct:true},{text:"E-Mail-Adressen und Telefonnummern.",correct:false},{text:"Nur Krankheitsdiagnosen und genetische Daten.",correct:false}],
+successMsg:"⚔️ SENSITIV-FÜRST ENTTARNT!",
+successText:"Richtig! Das revDSG Art. 5 lit. c definiert besonders schützenswerte Personendaten abschliessend: Gesundheit und Intimsphäre, religiöse, weltanschauliche oder politische Ansichten, Rassenzugehörigkeit, Massnahmen der sozialen Hilfe, Daten über verwaltungs- und strafrechtliche Verfolgungen, genetische Daten sowie biometrische Daten, die eine natürliche Person eindeutig identifizieren. Diese Daten dürfen nur mit besonderer Rechtfertigung bearbeitet werden und erfordern erhöhte Schutzmassnahmen.",
+failMsg:"☠️ SCHUTZ UNZUREICHEND!",
+failText:"Falsch! Das revDSG hat eine klare, abschliessende Liste sensibler Datenkategorien — sie umfasst deutlich mehr als nur biometrische Daten. Besonders schützenswert sind: Gesundheit, Intimsphäre, Religion/Weltanschauung/Politik, Rassenzugehörigkeit, Sozialhilfe, Straf-/Verwaltungsverfahren, genetische und biometrische Daten. E-Mail-Adressen und Telefonnummern sind normale Personendaten — sie unterliegen dem allgemeinen Schutz, aber nicht den strengeren Regeln für sensitive Daten.",
+ref:"📜 revDSG Art. 5 lit. c: Besonders schützenswerte Personendaten — abschliessende Liste, erhöhte Anforderungen bei der Bearbeitung."},
+
+
+{difficulty:1,level:"Ebene I",room:"Das Datenschutzprinzip-Fundament",enemy:"📜",enemyName:"Der Grundsatz-Wächter",tag:"revDSG Art. 6",lore:"„Kenne die Grundprinzipien — sie tragen das gesamte Gebäude.",
+scenario:"Ein Unternehmen sammelt von neuen Kunden neben Name und Adresse auch Geburtsort, Nationalität, Haarfarbe und Schuhgrösse — «man weiss nie, was nützlich ist». Verstösst das gegen das revDSG?",
+choices:[{text:"Nein — mehr Daten sind immer besser für das Unternehmen.",correct:false},{text:"Ja — das revDSG verlangt Datensparsamkeit: Es dürfen nur Daten erhoben werden, die für den jeweiligen Zweck notwendig sind.",correct:true},{text:"Nur wenn die Daten gespeichert werden, nicht bei Erhebung.",correct:false},{text:"Nein — solange die Daten nicht weitergegeben werden.",correct:false}],
+successMsg:"⚔️ GRUNDSATZ-WÄCHTER BEFRIEDIGT!",
+successText:"Richtig! Das Verhältnismässigkeitsprinzip (Art. 6 Abs. 2 revDSG) ist eines der zentralsten Grundprinzipien: Personendaten dürfen nur in dem Umfang bearbeitet werden, wie es der Zweck erfordert — nicht mehr. «Man weiss nie»-Argumente sind kein gültiger Zweck. Haarfarbe und Schuhgrösse sind für eine normale Kundenbeziehung schlicht irrelevant. Dieses Prinzip wird auch Datensparsamkeit oder Datenminimierung genannt und ist eng verwandt mit dem Grundsatz der Zweckbindung: Daten für einen Zweck erheben, nicht auf Vorrat.",
+failMsg:"☠️ DATENSPARSAMKEIT VERLETZT!",
+failText:"Falsch! «Mehr ist mehr» ist kein datenschutzrechtliches Prinzip — im Gegenteil. Das revDSG Art. 6 Abs. 2 schreibt ausdrücklich vor, dass Daten verhältnismässig sein müssen: nur so viele, wie für den definierten Zweck notwendig. Wer Daten auf Vorrat sammelt, verstösst gegen das Verhältnismässigkeitsprinzip. Das ist unabhängig davon, ob die Daten gespeichert, weitergegeben oder nur kurz betrachtet werden — die Erhebung selbst ist bereits die Bearbeitung.",
+ref:"📜 revDSG Art. 6 Abs. 2: Verhältnismässigkeitsprinzip — nur notwendige Daten erheben, keine Vorratsdatenspeicherung, Zweckbindung beachten."},
+
+{difficulty:1,level:"Ebene I",room:"Die Informationspflicht-Halle",enemy:"📢",enemyName:"Der Transparenz-Troll",tag:"revDSG Art. 19",lore:"„Wer sammelt, muss erklären — klar, verständlich, vollständig.",
+scenario:"Ein Unternehmen erhebt bei der Registrierung E-Mail-Adressen und Namen. Über was muss es Nutzerinnen und Nutzer mindestens informieren?",
+choices:[{text:"Nur über den Zweck der Datenbearbeitung.",correct:false},{text:"Identität des Verantwortlichen, Zweck der Bearbeitung, Empfänger-Kategorien und allfällige Auslandsbekanntgaben.",correct:true},{text:"Nur über den Zweck und wie lange Daten gespeichert werden.",correct:false},{text:"Gar nicht — Registrierungsdaten sind öffentlich zugänglich.",correct:false}],
+successMsg:"⚔️ TRANSPARENZ-TROLL GEBÄNDIGT!",
+successText:"Richtig! Das revDSG Art. 19 definiert einen klaren Mindestinhalt der Informationspflicht bei der Erhebung von Personendaten: Identität und Kontaktdaten des Verantwortlichen, Zweck der Bearbeitung, allfällige Empfänger oder Empfänger-Kategorien (auch Auslandsbekanntgaben). Diese Informationen müssen zum Zeitpunkt der Erhebung vorliegen — nicht irgendwann später. Fehlen diese Angaben, verletzt das Unternehmen das Transparenzgebot, selbst wenn die Daten korrekt gespeichert sind. Die Informationen müssen verständlich, klar und leicht zugänglich sein — nicht im Kleingedruckten versteckt.",
+failMsg:"☠️ TRANSPARENZ VERLETZT!",
+failText:"Falsch! Das revDSG Art. 19 schreibt mehr vor als nur den Zweck: Mindestens anzugeben sind Identität des Verantwortlichen, Zweck, Empfänger-Kategorien und allfällige Auslandsbekanntgaben. Das sind die Grundbausteine einer gültigen Datenschutzerklärung. Eine reine Zweckangabe oder das Weglassen von Empfänger-Infos ist ungenügend. Ausserdem: Die Informationen müssen zum Zeitpunkt der Datenerhebung verfügbar sein — nicht erst auf Anfrage.",
+ref:"📜 revDSG Art. 19: Informationspflicht — Mindestinhalt: Identität des Verantwortlichen, Zweck, Empfänger, Auslandsbekanntgaben. Zum Zeitpunkt der Erhebung."},
+
+{difficulty:2,level:"Ebene II",room:"Die Datenschutzberater-Zitadelle",enemy:"🧙",enemyName:"Der EDÖB-Wächter",tag:"revDSG Art. 10",lore:"„Ein Berater im Haus kann Strafen abwenden — doch er ist freiwillig.",
+scenario:"Ein Schweizer Unternehmen ernennt freiwillig einen internen Datenschutzberater (DSB). Welchen konkreten Vorteil bringt das nach revDSG?",
+choices:[{text:"Der DSB kann das Unternehmen bei Verstössen vollständig von Sanktionen befreien.",correct:false},{text:"Das Unternehmen muss bei einer EDÖB-Untersuchung zuerst den DSB als Ansprechpartner nennen können.",correct:false},{text:"Das Unternehmen kann auf die Datenschutz-Folgenabschätzung verzichten, wenn der DSB zustimmt.",correct:false},{text:"Das Unternehmen kann den EDÖB um Vorabkonsultation bitten und der DSB fungiert als interne Anlaufstelle — was Vertrauen signalisiert.",correct:true}],
+successMsg:"⚔️ DER EDÖB-WÄCHTER NICKT ANERKENNEND!",
+successText:"Richtig! Der freiwillige Datenschutzberater bringt mehrere Vorteile: Er fungiert als interne Anlaufstelle für Datenschutzfragen und -beschwerden, was die Compliance-Kultur stärkt. Bei einer EDÖB-Untersuchung signalisiert ein benannter DSB, dass das Unternehmen Datenschutz ernst nimmt — das kann die Tonalität eines Verfahrens beeinflussen. Zudem kann das Unternehmen nach Art. 10 Abs. 3 revDSG beim EDÖB eine Vorabkonsultation beantragen, wenn ein DSB benannt ist. Eine vollständige Haftungsbefreiung gibt es jedoch nicht — der DSB haftet nicht anstelle des Unternehmens.",
+failMsg:"☠️ DSB-FUNKTION FALSCH VERSTANDEN!",
+failText:"Falsch! Ein Datenschutzberater ersetzt keine DSFA und befreit nicht von Sanktionen. Er ist eine interne Unterstützungsstruktur. Der Hauptnutzen: interne Anlaufstelle, Signalwirkung gegenüber dem EDÖB, Möglichkeit zur Vorabkonsultation. Ein DSB übernimmt keine persönliche Haftung für Verstösse des Unternehmens — die Verantwortlichkeit bleibt beim Unternehmen und letztlich bei den handelnden natürlichen Personen. Im Gegensatz zur EU-DSGVO ist der DSB in der Schweiz freiwillig.",
+ref:"📜 revDSG Art. 10: Datenschutzberater freiwillig — Vorteile: interne Anlaufstelle, Vorabkonsultations-Möglichkeit beim EDÖB, Signalwirkung. Keine Haftungsbefreiung."},
+
+{difficulty:2,level:"Ebene II",room:"Das Datenschutzerklärung-Schloss",enemy:"📄",enemyName:"Der Kleingedruckt-Dämon",tag:"revDSG Art. 19",lore:"„Was niemand versteht, schützt niemanden — auch dich nicht.",
+scenario:"Ein Unternehmen fragt: «Wir haben eine 50-seitige Datenschutzerklärung in juristischem Fachjargon auf unserer Website. Sind wir compliant?» Was ist die korrekte Antwort?",
+choices:[{text:"Ja — Hauptsache, die Erklärung ist vollständig und vorhanden.",correct:false},{text:"Nein — Datenschutzerklärungen müssen klar, verständlich und für die Zielgruppe lesbar sein.",correct:true},{text:"Ja — Länge zeigt Gründlichkeit und ist ein Zeichen von Compliance.",correct:false},{text:"Das revDSG schreibt keine bestimmte Form der Datenschutzerklärung vor.",correct:false}],
+successMsg:"⚔️ KLEINGEDRUCKT ENTZAUBERT!",
+successText:"Richtig! Das Transparenzgebot des revDSG Art. 19 verlangt nicht nur, dass Informationen vorhanden sind — sie müssen auch verständlich sein. Eine 50-seitige Erklärung in Juristensprache erfüllt den Geist des Gesetzes nicht, wenn sie niemand liest oder versteht. Die Aufsichtsbehörden orientieren sich an «verständlich für die Zielgruppe» — bei Konsumenten bedeutet das: klare Sprache, logische Struktur, kurze Sätze. Empfehlung: Layered Privacy Notices (kurze Zusammenfassung + Detailversion) sind eine gute Praxis, die Verständlichkeit und Vollständigkeit verbindet.",
+failMsg:"☠️ NIEMAND LIEST DAS!",
+failText:"Falsch! Eine unlesbare Datenschutzerklärung ist aus Datenschutzsicht wertlos — sie informiert niemanden wirklich. Das revDSG verlangt Transparenz, und Transparenz bedeutet auch Verständlichkeit für die Zielgruppe. 50 Seiten Juristendeutsch mögen vollständig sein, aber sie verletzen den Geist des Transparenzgebots. Praxis-Tipp: Kurze, klare Datenschutzerklärungen mit «Mehr lesen»-Links sind besser als epische Rechtsdokumente, die niemand durchliest.",
+ref:"📜 revDSG Art. 19: Informationspflicht — klar, verständlich, für die Zielgruppe lesbar. Vollständigkeit allein genügt nicht."},
+
+// ===== SCHWIERIGKEIT 2: Fortgeschritten =====
+{difficulty:2,level:"Ebene II",room:"Das Verzeichnis-Verlies",enemy:"📋",enemyName:"Baron Verzeichnis",tag:"revDSG Art. 12",lore:"„Was nicht dokumentiert ist, existiert nicht vor dem Gesetz.",
+scenario:"Ein KMU mit 40 Mitarbeitern fragt: «Müssen wir ein Verzeichnis der Bearbeitungstätigkeiten führen?» Welche Antwort ist korrekt?",
+choices:[{text:"Nein — nur Unternehmen mit über 250 Mitarbeitenden.",correct:false},{text:"Ja — das Verzeichnis ist für alle Unternehmen ohne Ausnahme Pflicht.",correct:false},{text:"Grundsätzlich ja, ausser das Unternehmen ist klein, das Risiko gering und die Bearbeitung nicht regelmässig.",correct:true},{text:"Nur wenn besonders schützenswerte Personendaten bearbeitet werden.",correct:false}],
+successMsg:"⚔️ BARON VERZEICHNIS IST BESIEGT!",
+successText:"Richtig! Das revDSG schreibt in Art. 12 ein Verzeichnis der Bearbeitungstätigkeiten vor — aber mit einer wichtigen Ausnahme: Kleine Unternehmen (gemäss Art. 24 DSV: unter 250 Mitarbeitende) können auf das Verzeichnis verzichten, sofern die Bearbeitung kein hohes Risiko für die Persönlichkeit der Betroffenen mit sich bringt und die Datenbearbeitung nicht regelmässig erfolgt. Sobald jedoch besonders schützenswerte Daten verarbeitet werden oder umfangreiches Profiling stattfindet, entfällt die Ausnahme — unabhängig von der Unternehmensgrösse.",
+failMsg:"☠️ KEINE DOKUMENTATION — KEINE COMPLIANCE!",
+failText:"Falsch! Die 250-Mitarbeiter-Grenze, die viele aus der EU-DSGVO kennen, gilt für die Schweiz ähnlich — aber die Kriterien sind etwas anders: Laut Art. 24 DSV können kleine Unternehmen das Verzeichnis weglassen, wenn Bearbeitungen kein hohes Risiko darstellen und nicht regelmässig erfolgen. Sobald aber sensitive Daten oder umfangreiches Profiling ins Spiel kommt, ist das Verzeichnis Pflicht — bei jeder Unternehmensgrösse. Das Verzeichnis muss Bearbeitungszwecke, Datenkategorien, Empfänger und Aufbewahrungsfristen enthalten.",
+ref:"📜 revDSG Art. 12 & DSV Art. 24: Verzeichnis Pflicht mit Ausnahmen für kleine Betriebe ohne hohes Risiko."},
+
+{difficulty:2,level:"Ebene II",room:"Die Datenpanne-Gruft",enemy:"💥",enemyName:"Der Datenleck-Fürst",tag:"revDSG Art. 24",lore:"„Eine Datenpanne verschwiegen ist ein Vergehen — melde sie rechtzeitig.",
+scenario:"Ein Schweizer Unternehmen bemerkt, dass Kundendaten nach einem Hackerangriff abgeflossen sind. Welche Meldepflicht gilt nach revDSG?",
+choices:[{text:"Meldung innerhalb von 72 Stunden an den EDÖB — wie in der EU.",correct:false},{text:"Meldung «so rasch als möglich» an den EDÖB, wenn ein hohes Risiko für Betroffene besteht.",correct:true},{text:"Keine Meldepflicht — das revDSG kennt keine Datenpannen-Meldung.",correct:false},{text:"Meldung nur an die betroffenen Personen, nicht an den EDÖB.",correct:false}],
+successMsg:"⚔️ DATENLECK-FÜRST VERSIEGELT!",
+successText:"Richtig! Das revDSG Art. 24 schreibt eine Meldung an den EDÖB «so rasch als möglich» vor — aber nur wenn die Verletzung voraussichtlich zu einem hohen Risiko für die Persönlichkeit oder Grundrechte der betroffenen Personen führt. Im Gegensatz zur EU-DSGVO gibt es keine starre 72-Stunden-Frist. Wenn Betroffene direkt gefährdet sind (z.B. Risiko von Identitätsdiebstahl oder Diskriminierung), müssen auch sie benachrichtigt werden. Das Unternehmen muss den Vorfall dokumentieren, auch wenn keine Meldepflicht besteht.",
+failMsg:"☠️ DAS DATENLECK ÜBERSCHWEMMT ALLES!",
+failText:"Falsch! Die 72-Stunden-Frist kennt nur die EU-DSGVO (Art. 33). Das revDSG ist bewusst flexibler formuliert: «so rasch als möglich» — das bedeutet, sobald das Unternehmen von der Verletzung weiss und das Risiko eingeschätzt hat. Allerdings sollte man nicht monatelang warten. Die Meldung geht an den EDÖB, nicht an eine Strafverfolgungsbehörde. Bei hohem Risiko für Betroffene sind auch diese direkt zu informieren. Fehlende Meldung bei tatsächlicher Pflicht kann als vorsätzliche Verletzung gewertet werden.",
+ref:"📜 revDSG Art. 24: Meldung von Datenpannen an den EDÖB «so rasch als möglich» bei hohem Risiko — keine starre 72h-Frist wie in der DSGVO."},
+
+{difficulty:2,level:"Ebene II",room:"Der Drittland-Abgrund",enemy:"🌍",enemyName:"Der Transferdämon",tag:"revDSG Art. 16-17",lore:"„Nicht jedes Land schützt Daten gleich gut. Prüfe, bevor du sendest.",
+scenario:"Ein Unternehmen möchte Schweizer Kundendaten in die USA übermitteln. Was ist zwingend zu beachten?",
+choices:[{text:"Daten in die USA zu schicken ist grundsätzlich verboten.",correct:false},{text:"Die USA gelten als Land mit angemessenem Datenschutz — keine Massnahmen nötig.",correct:false},{text:"Die USA stehen nicht auf der EDÖB-Anerkennungsliste — es braucht geeignete Garantien wie Standardvertragsklauseln.",correct:true},{text:"Es reicht, den Kunden per E-Mail über die Übermittlung zu informieren.",correct:false}],
+successMsg:"⚔️ DER TRANSFERDÄMON IST GEBANNT!",
+successText:"Richtig! Die USA sind kein Land mit anerkannt angemessenem Datenschutzniveau gemäss der EDÖB-Länderliste. Für Datenübermittlungen in die USA braucht es daher geeignete Garantien — in der Praxis meist Standardvertragsklauseln (SCC) oder Binding Corporate Rules (BCR). Seit dem EU-US Data Privacy Framework 2023 gibt es für EU-Daten eine neue Basis, aber für Schweizer Daten gilt das nicht automatisch — hier braucht es den Schweizer «Swiss-US DPF»-Rahmen, der separat anerkannt werden muss. Der EDÖB publiziert regelmässig die aktuelle Länderliste.",
+failMsg:"☠️ DATEN VERLOREN IM DRITTLAND!",
+failText:"Falsch! Ohne geeignete Garantien sind Datenübermittlungen in Länder ohne anerkanntes Schutzniveau unzulässig. Die USA stehen nicht auf der EDÖB-Anerkennungsliste. Das bedeutet: Es braucht vertragliche Absicherungen wie Standardvertragsklauseln. Eine blosse Information des Kunden reicht nicht aus — es geht um strukturelle Schutzmechanismen, nicht um Transparenz allein. Verstösse gegen Art. 16-17 revDSG können als vorsätzliche Handlung nach Art. 61 revDSG sanktioniert werden.",
+ref:"📜 revDSG Art. 16-17: Bekanntgabe ins Ausland — nur an Länder mit EDÖB-Anerkennung oder mit geeigneten Garantien (SCC, BCR)."},
+
+{difficulty:2,level:"Ebene II",room:"Das Auftragsbearbeitungs-Verlies",enemy:"🤝",enemyName:"Der Dienstleister-Dämon",tag:"revDSG Art. 9",lore:"„Wer Daten outsourct, bleibt verantwortlich.",
+scenario:"Ein Unternehmen beauftragt einen externen IT-Dienstleister mit der Verarbeitung von Kundendaten. Welche Aussage ist korrekt?",
+choices:[{text:"Ein schriftlicher Auftragsbearbeitungsvertrag ist zwingend erforderlich.",correct:true},{text:"Der Dienstleister braucht nur eine mündliche Geheimhaltungspflicht.",correct:false},{text:"Der Verantwortliche kann die datenschutzrechtliche Verantwortung vollständig auf den Dienstleister übertragen.",correct:false},{text:"Es braucht die vorgängige Genehmigung des EDÖB.",correct:false}],
+successMsg:"⚔️ DIENSTLEISTER-DÄMON VERTRAGLICH GEBUNDEN!",
+successText:"Richtig! Das revDSG Art. 9 verlangt einen schriftlichen Auftrag — der Auftragsbearbeitungsvertrag (AV-Vertrag). Dieser muss regeln: welche Daten verarbeitet werden, zu welchem Zweck, welche Sicherheitsmassnahmen gelten und ob Unterauftragnehmer eingesetzt werden dürfen. Entscheidend: Die datenschutzrechtliche Verantwortung verbleibt beim Auftraggeber. Der Dienstleister ist «Auftragsbearbeiter» — er darf Daten nur gemäss Weisung des Auftraggebers bearbeiten. Verletzt der Dienstleister den Datenschutz, kann trotzdem der Auftraggeber haftbar sein, wenn er die Aufsicht vernachlässigt hat.",
+failMsg:"☠️ UNKONTROLLIERTER DATENFLUSS!",
+failText:"Falsch! Ohne schriftlichen Auftragsbearbeitungsvertrag ist die Übermittlung an einen Dienstleister bereits ein Datenschutzproblem. Das revDSG verlangt in Art. 9 klare vertragliche Regelungen. Mündliche Absprachen genügen nicht — der Vertrag muss Zweck, Art der Daten, Sicherheitsmassnahmen und Unterauftragnehmer-Regelungen enthalten. Die Verantwortung bleibt immer beim ursprünglichen Verantwortlichen: Wer Daten outsourct, muss dennoch für deren Schutz geradestehen.",
+ref:"📜 revDSG Art. 9: Auftragsbearbeitung — schriftlicher Vertrag Pflicht, Verantwortlichkeit bleibt beim Auftraggeber, Kontrolle über Unterauftragnehmer."},
+
+// ===== SCHWIERIGKEIT 3: Experten =====
+{difficulty:3,level:"Ebene III",room:"Die Profiling-Höhle",enemy:"🤖",enemyName:"Der KI-Dämon",tag:"revDSG Art. 5 lit. f",lore:"„Wenn Maschinen über Menschen urteilen, muss der Mensch wachsam sein.",
+scenario:"Ein Schweizer Fintech erstellt vollautomatisch Kreditentscheide auf Basis von Personendaten ohne menschliche Überprüfung. Was gilt nach revDSG?",
+choices:[{text:"Vollautomatische Entscheidungen sind in der Schweiz uneingeschränkt erlaubt.",correct:false},{text:"Bei «Profiling mit hohem Risiko» haben Betroffene das Recht, eine menschliche Überprüfung zu verlangen.",correct:true},{text:"Nur wenn Gesundheitsdaten verwendet werden, gelten besondere Regeln.",correct:false},{text:"Das revDSG regelt automatisierte Entscheidungen und KI gar nicht.",correct:false}],
+successMsg:"⚔️ DER KI-DÄMON IST UNTERJOCHT!",
+successText:"Richtig! Das revDSG führt in Art. 5 lit. f das Konzept «Profiling mit hohem Risiko» ein — das ist eine Neuheit gegenüber dem alten DSG. Profiling mit hohem Risiko liegt vor, wenn die automatisierte Verknüpfung von Personendaten eine Beurteilung ermöglicht, die erhebliche Auswirkungen auf die betroffene Person hat. In solchen Fällen müssen Betroffene nach Art. 21 revDSG informiert werden und können verlangen, dass ein Mensch die Entscheidung überprüft. Kreditentscheide, Versicherungsprämien oder Stellenbewerbungen sind klassische Anwendungsfälle.",
+failMsg:"☠️ DER ALGORITHMUS TRIUMPHIERT!",
+failText:"Falsch! Das revDSG hat mit Art. 5 lit. f explizit das «Profiling mit hohem Risiko» eingeführt — ein Begriff, der im alten DSG nicht existierte. Bei Entscheidungen mit erheblichen Auswirkungen (Kreditvergabe, Versicherung, Einstellung) müssen Betroffene informiert werden und können eine menschliche Überprüfung verlangen. Das schützt vor algorithmischer Diskriminierung. Unternehmen müssen ihre KI-Systeme daher so gestalten, dass ein menschliches Eingreifen möglich bleibt.",
+ref:"📜 revDSG Art. 5 lit. f & Art. 21: Profiling mit hohem Risiko — Informationspflicht und Recht auf menschliche Überprüfung bei erheblichen Auswirkungen."},
+
+{difficulty:3,level:"Ebene III",room:"Die Datenschutzfolgenabschätzung",enemy:"⚖️",enemyName:"Der Risikorichter",tag:"revDSG Art. 22",lore:"„Erkenne das Risiko, bevor es dich findet.",
+scenario:"Ein Spital plant ein KI-gestütztes System zur automatischen Priorisierung von Patientenakten. Welche Massnahme ist nach revDSG zwingend?",
+choices:[{text:"Keine besondere Massnahme — das revDSG kennt keine Datenschutz-Folgenabschätzung.",correct:false},{text:"Eine Datenschutz-Folgenabschätzung (DSFA) muss durchgeführt werden, bevor das System in Betrieb geht.",correct:true},{text:"Eine DSFA ist nur nötig, wenn das System extern zugänglich ist.",correct:false},{text:"Die DSFA muss vom EDÖB durchgeführt werden, nicht vom Spital selbst.",correct:false}],
+successMsg:"⚔️ DER RISIKORICHTER IST BESÄNFTIGT!",
+successText:"Richtig! Das revDSG Art. 22 schreibt eine Datenschutz-Folgenabschätzung (DSFA) vor, wenn eine Bearbeitung voraussichtlich ein hohes Risiko für die Persönlichkeit oder Grundrechte der betroffenen Personen mit sich bringt. Bei Gesundheitsdaten kombiniert mit KI-Verarbeitung ist diese Schwelle fast immer erreicht. Die DSFA muss vom Verantwortlichen selbst durchgeführt werden (nicht vom EDÖB) und umfasst: Beschreibung der Bearbeitung, Risikobewertung, geplante Massnahmen. Falls nach der DSFA noch hohes Risiko bleibt, muss der EDÖB konsultiert werden.",
+failMsg:"☠️ DAS RISIKO IST UNKONTROLLIERT!",
+failText:"Falsch! Das revDSG Art. 22 schreibt die DSFA explizit vor — das ist ein zentrales Instrument des neuen Datenschutzrechts. Sie muss vom Verantwortlichen selbst durchgeführt werden, bevor die Bearbeitung beginnt, nicht nachher. Bei Gesundheitsdaten und automatisierter Verarbeitung ist das Risikokriterium fast immer erfüllt. Interessant: Wenn die DSFA ein verbleibendes hohes Risiko ergibt und keine Abhilfemassnahmen möglich sind, muss der EDÖB vorgängig konsultiert werden — ähnlich wie die DSGVO Art. 36.",
+ref:"📜 revDSG Art. 22: DSFA bei Hochrisiko-Bearbeitungen — Pflicht des Verantwortlichen, vor Inbetriebnahme, EDÖB-Konsultation bei verbleibendem Restrisiko."},
+
+{difficulty:3,level:"Ebene IV",room:"Das Sanktions-Schlachtfeld",enemy:"💀",enemyName:"Der Bussgeld-König",tag:"revDSG Art. 60-62",lore:"„Das revDSG straft — aber wen genau? Das überrascht viele.",
+scenario:"Ein Mitarbeiter gibt vorsätzlich und unbefugt Kundendaten an Dritte weiter. Sein Vorgesetzter wusste davon und schwieg. Was droht nach revDSG?",
+choices:[{text:"Nur das Unternehmen wird mit einer Unternehmensbusse bis CHF 10 Mio. sanktioniert.",correct:false},{text:"Beide — Mitarbeiter und Vorgesetzter — können persönlich mit bis zu CHF 250'000 Busse bestraft werden.",correct:true},{text:"Nur der Mitarbeiter wird gebüsst, der Vorgesetzte nicht.",correct:false},{text:"Das revDSG kennt keine Strafbestimmungen für Einzelpersonen.",correct:false}],
+successMsg:"⚔️ DER BUSSGELD-KÖNIG IST OHNMÄCHTIG!",
+successText:"Richtig! Das ist einer der grössten Unterschiede zwischen revDSG und DSGVO: Während die DSGVO Unternehmen sanktioniert (bis zu 4% des Jahresumsatzes), richtet sich das revDSG primär gegen natürliche Personen. Art. 60 ff. revDSG sieht Bussen bis CHF 250'000 für vorsätzlich handelnde Einzelpersonen vor. Wer als Vorgesetzter von einem Verstoss weiss und schweigt, kann nach Art. 62 revDSG ebenfalls als Mittäter oder durch Unterlassen haftbar gemacht werden. Das ist ein starker Anreiz für Führungskräfte, Datenschutzverstösse aktiv zu verhindern.",
+failMsg:"☠️ DU UNTERSCHÄTZT DEN BUSSGELD-KÖNIG!",
+failText:"Falsch! Das revDSG sanktioniert in erster Linie natürliche Personen, nicht Unternehmen — das ist ein fundamentaler Unterschied zur EU-DSGVO. Art. 60 ff. revDSG sieht Bussen bis CHF 250'000 für vorsätzlich handelnde Individuen vor. Der Vorgesetzte, der wusste und schwieg, kann nach Art. 62 revDSG mitverantwortlich gemacht werden. Unternehmen können nur unter engen Voraussetzungen gebüsst werden (Art. 64). Das bedeutet: Datenschutz ist in der Schweiz Chefsache im wahrsten Sinne — Führungskräfte haften persönlich.",
+ref:"📜 revDSG Art. 60-64: Strafbestimmungen — primär natürliche Personen, Bussen bis CHF 250'000 bei Vorsatz, Vorgesetzte können mitverantwortlich sein."},
+
+{difficulty:3,level:"Ebene IV",room:"Die Cookie-Höhle",enemy:"🍪",enemyName:"Der Cookie-Geist",tag:"revDSG / FMG Art. 45c",lore:"„Was dich verfolgt, muss dich zuerst um Erlaubnis fragen.",
+scenario:"Ein Schweizer Unternehmen setzt auf seiner Website Marketing-Cookies ein. Der Webmaster behauptet: «Ein Banner mit ‹Durch Nutzung stimmen Sie zu› reicht.» Stimmt das?",
+choices:[{text:"Ja — ein Hinweis-Banner genügt nach Schweizer Recht.",correct:false},{text:"Nein — Marketing-Cookies erfordern eine aktive, informierte Einwilligung. Weiternutzung gilt nicht als Zustimmung.",correct:true},{text:"Ja — solange es eine Datenschutzerklärung gibt.",correct:false},{text:"Nur bei Nutzern aus der EU braucht es eine echte Einwilligung.",correct:false}],
+successMsg:"⚔️ COOKIE-GEIST EINGESPERRT!",
+successText:"Richtig! Das Fernmeldegesetz (FMG Art. 45c) in Verbindung mit dem revDSG verlangt für nicht-notwendige Cookies — darunter Marketing, Tracking, Analytics — eine informierte und aktive Einwilligung. «Durch weitere Nutzung stimmen Sie zu» ist kein gültiger Consent, weil keine aktive Handlung vorliegt. Zulässig sind Cookies, die für den Betrieb der Website technisch notwendig sind (Session-Cookies, Login). Für alle anderen braucht es einen echten Consent-Mechanismus mit echter Ablehnungsmöglichkeit — gleichwertig und ohne Nachteil bei Ablehnung.",
+failMsg:"☠️ TRACKING OHNE ERLAUBNIS!",
+failText:"Falsch! Ein reiner Hinweis-Banner ohne echte Wahlmöglichkeit genügt nicht. Das FMG Art. 45c verbietet den Einsatz nicht-notwendiger Cookies ohne Einwilligung. Die Einwilligung muss aktiv, informiert und spezifisch sein — «Cookie-Wände» (Seite nur zugänglich mit Cookie-Akzeptanz) sind problematisch, weil sie die Freiwilligkeit untergraben. Die Ablehnungsmöglichkeit muss gleich prominent sein wie die Annahme-Möglichkeit. Dark Patterns wie verkleinerte oder versteckte «Ablehnen»-Buttons sind unzulässig.",
+ref:"📜 FMG Art. 45c & revDSG: Einwilligung für nicht-notwendige Cookies — aktiv, informiert, spezifisch. Weiternutzung gilt nicht als Zustimmung."},
+
+{difficulty:3,level:"Ebene IV",room:"Die KI-Verarbeitungs-Kammer",enemy:"🧠",enemyName:"Der Daten-Alchemist",tag:"revDSG Art. 6",lore:"„Neue Technologien, alte Prinzipien — Zweckbindung gilt immer.",
+scenario:"Ein Unternehmen möchte Kundendaten, die für Vertragsabwicklung erhoben wurden, zum Training eines eigenen KI-Modells verwenden. Was ist die korrekte rechtliche Einschätzung?",
+choices:[{text:"Erlaubt — interne Nutzung ist immer zulässig.",correct:false},{text:"Erlaubt — wenn die Daten anonymisiert werden.",correct:false},{text:"KI-Training ist eine neue Bearbeitung mit anderem Zweck — es braucht eine eigene Rechtsgrundlage (Einwilligung oder überwiegendes Interesse).",correct:true},{text:"Erlaubt — wenn das KI-Modell nicht veröffentlicht wird.",correct:false}],
+successMsg:"⚔️ DATEN-ALCHEMIST GESTOPPT!",
+successText:"Richtig! Das Zweckbindungsprinzip aus Art. 6 Abs. 3 revDSG ist klar: Daten dürfen nur für den Zweck verwendet werden, für den sie erhoben wurden — oder für einen kompatiblen Zweck. KI-Training ist typischerweise kein kompatibler Zweck zur Vertragsabwicklung. Es braucht daher eine eigene Rechtsgrundlage: entweder eine ausdrückliche Einwilligung der betroffenen Personen, oder der Verantwortliche kann ein überwiegendes Interesse geltend machen (Interessenabwägung). Wichtig: Echte Anonymisierung könnte das Datenschutzrecht ausschliessen — aber Anonymisierung ist technisch schwierig und wird oft überschätzt.",
+failMsg:"☠️ KI-DATEN MISSBRAUCHT!",
+failText:"Falsch! Das Zweckbindungsprinzip gilt auch für KI-Training — und gerade dort wird es häufig ignoriert. Daten, die für Vertragsabwicklung erhoben wurden, dürfen nicht einfach für andere Zwecke wie KI-Training verwendet werden. Das gilt auch für interne Nutzung. Eine echte Anonymisierung könnte die Situation ändern — aber Achtung: Was als «anonymisiert» gilt, ist oft re-identifizierbar. Der Einsatz synthetischer Daten oder expliziter Einwilligungen wäre der rechtssicherere Weg.",
+ref:"📜 revDSG Art. 6 Abs. 3: Zweckbindungsprinzip — KI-Training braucht eigene Rechtsgrundlage, Anonymisierung als Alternative nur bei echter Wirksamkeit."},
+
+{difficulty:3,level:"Ebene V — Endboss I",room:"Das Beschäftigten-Dunkel",enemy:"👔",enemyName:"Der HR-Inquisitor",tag:"OR Art. 328b & revDSG",lore:"„Mitarbeitende sind keine Datenpakete — auch nicht im Homeoffice.",
+scenario:"Ein Arbeitgeber installiert auf Firmen-Laptops im Homeoffice eine Software, die alle 5 Minuten Screenshots macht und Tastatureingaben protokolliert. Ist das rechtlich zulässig?",
+choices:[{text:"Ja — auf Firmengeräten hat der Arbeitgeber unbeschränktes Kontrollrecht.",correct:false},{text:"Nein — permanente Totalüberwachung verletzt Art. 328b OR und das revDSG, unabhängig vom Arbeitsort.",correct:true},{text:"Ja — im Homeoffice gelten andere Regeln als im Büro.",correct:false},{text:"Nur wenn die Mitarbeitenden per Vertrag zugestimmt haben, ist es zulässig.",correct:false}],
+successMsg:"⚔️ HR-INQUISITOR IST ZURÜCKGEPFIFFEN!",
+successText:"Richtig! Art. 328b OR (Datenschutz im Arbeitsverhältnis) in Verbindung mit dem revDSG erlaubt Mitarbeitendenüberwachung nur soweit sie für den Arbeitsvertrag notwendig und verhältnismässig ist. Screenshots alle 5 Minuten und Tastaturprotokollierung sind klassische Formen der Totalüberwachung — diese sind grundsätzlich unzulässig, weil sie weit über das hinausgehen, was zur Arbeitsleistungsüberprüfung nötig wäre. Selbst eine vertragliche Zustimmung schützt nicht vollständig: Eine Einwilligung im Arbeitsverhältnis ist selten wirklich «freiwillig», weil ein Machtgefälle besteht.",
+failMsg:"☠️ MITARBEITENDE SIND KEINE DATENPAKETE!",
+failText:"Falsch! Das Arbeitsverhältnis begründet kein unbeschränktes Kontrollrecht. Art. 328b OR schränkt die Datenbearbeitung über Mitarbeitende auf das Notwendige ein — und permanente Screenshots plus Tastaturprotokollierung sind weit über das Notwendige. Das Homeoffice ändert daran nichts: Auch dort gilt Schweizer Recht. Eine vertragliche Zustimmung hilft wenig, weil Einwilligungen im Arbeitsverhältnis wegen des Machtgefälles als nicht vollständig freiwillig gelten. Weniger invasive Alternativen (Zielvereinbarungen, Ergebniskontrolle) wären verhältnismässig.",
+ref:"📜 OR Art. 328b & revDSG Art. 6: Verhältnismässigkeitsprinzip bei Mitarbeitendenüberwachung — Totalüberwachung unzulässig, auch mit vertraglicher Zustimmung."},
+
+{difficulty:3,level:"Ebene V — Endboss II",room:"Die Löschgeist-Kammer",enemy:"💀",enemyName:"Der Löschgeist",tag:"revDSG Art. 32 & OR Art. 958f",lore:"„Löschung und Aufbewahrung — ein ewiger Konflikt der Rechtsnormen.",
+scenario:"Ein ehemaliger Mitarbeiter verlangt vollständige Datenlöschung. HR will alles behalten. Ein Anwalt sagt: «Das kommt drauf an.» Wer hat letztlich Recht?",
+choices:[{text:"Der Mitarbeiter — das Löschrecht ist absolut.",correct:false},{text:"HR — gesetzliche Pflichten gehen immer vor.",correct:false},{text:"Der Anwalt — es braucht eine Abwägung: Aufbewahrungspflichtige Daten bleiben, nicht-pflichtige werden gelöscht.",correct:true},{text:"Das revDSG kennt kein Recht auf Löschung.",correct:false}],
+successMsg:"⚔️ DER LÖSCHGEIST IST BESÄNFTIGT!",
+successText:"Richtig! Das Recht auf Löschung (implizit in Art. 32 revDSG, der Berichtigung und Löschung anspricht) ist nicht absolut. Es muss gegen gesetzliche Aufbewahrungspflichten abgewogen werden: Lohnunterlagen und Geschäftsbücher müssen nach OR Art. 958f 10 Jahre aufbewahrt werden. Sozialversicherungsunterlagen teils ebenfalls. Daten ohne Aufbewahrungspflicht — z.B. interne Notizen, Kommunikation — müssen hingegen gelöscht werden. Der Mitarbeiter hat also ein partielles Löschrecht: für nicht-pflichtige Daten sofort, für pflichtige erst nach Ablauf der Aufbewahrungsfrist.",
+failMsg:"☠️ FALSCHES URTEIL!",
+failText:"Falsch! Weder absolutesr Löschanspruch noch totale Aufbewahrung ist korrekt — es braucht eine Abwägung. Das revDSG anerkennt das Recht auf Löschung, aber gesetzliche Aufbewahrungspflichten gehen vor. OR Art. 958f: 10 Jahre für Geschäftsbücher. Daten ohne solche Pflicht sind zu löschen. Praktische Empfehlung: Ein Löschkonzept, das klar regelt, welche Daten wie lange aufzubewahren sind, schützt das Unternehmen auf beiden Seiten — gegenüber Löschansprüchen und gegenüber Revisionspflichten.",
+ref:"📜 revDSG Art. 32 & OR Art. 958f: Löschrecht vs. Aufbewahrungspflicht — Abwägung nötig, partielles Löschrecht für nicht-aufbewahrungspflichtige Daten."},
+
+{difficulty:3,level:"Ebene V — ENDBOSS",room:"Throne des EDÖB",enemy:"👑",enemyName:"Der EDÖB-Endgegner",tag:"revDSG Art. 49-60",lore:"„Der Wächter des Schweizer Datenschutzes hat neue Zähne bekommen.",
+scenario:"FINALBOSS: Was ist der bedeutendste neue Befugnis des EDÖB nach dem revDSG im Vergleich zum alten DSG?",
+choices:[{text:"Der EDÖB kann neu direkt Bussen bis CHF 250'000 gegen Unternehmen aussprechen.",correct:false},{text:"Der EDÖB kann neu verbindliche Verfügungen erlassen — z.B. Bearbeitungsverbote oder Löschbefehle.",correct:true},{text:"Der EDÖB kann nun Hausdurchsuchungen bei Unternehmen anordnen.",correct:false},{text:"Der EDÖB übernimmt die Strafverfolgung bei Datenschutzverletzungen.",correct:false}],
+successMsg:"🏆 ENDBOSS BESIEGT! REVDSG-LEGENDE!",
+successText:"PERFEKT! Der entscheidende Machtzuwachs des EDÖB: Früher konnte er nur Empfehlungen aussprechen — die Unternehmen ignorieren konnten. Seit dem revDSG Art. 49 ff. kann der EDÖB verbindliche Verfügungen erlassen: Bearbeitungsverbote, Anweisungen zur Löschung, Verpflichtungen zur Datenschutz-Folgenabschätzung. Diese Verfügungen sind anfechtbar beim Bundesverwaltungsgericht. Die Bussenkompetenz liegt weiterhin bei den Strafverfolgungsbehörden der Kantone, nicht beim EDÖB selbst. Dieser Unterschied ist entscheidend und wird oft verwechselt.",
+failMsg:"☠️ DER EDÖB TRIUMPHIERT!",
+failText:"Falsch! Die Bussenkompetenz (bis CHF 250'000) liegt bei den kantonalen Strafverfolgungsbehörden, nicht beim EDÖB. Der EDÖB erhielt mit dem revDSG die Kompetenz, verbindliche Verfügungen zu erlassen — das ist der grosse Unterschied zum alten DSG, wo er nur empfehlen durfte. Keine Hausdurchsuchungen (das wäre Sache der Strafverfolgung), keine direkte Strafverfolgung. Aber: Verfügungen des EDÖB sind verbindlich und beim Bundesverwaltungsgericht anfechtbar — das verleiht ihnen echtes Gewicht.",
+ref:"📜 revDSG Art. 49-60: EDÖB neu mit Verfügungskompetenz (Bearbeitungsverbote, Löschbefehle). Bussenkompetenz bleibt bei kantonalen Strafbehörden."}
+];
+
+const TOTAL_Q=20,HP_DAMAGE=5,SOULS_PER_CORRECT=500,WIN_THRESHOLD=14,TIMER_DURATION=30;
+
+// ===== SHUFFLE HELPERS =====
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function buildPlaylist(){
+  const pool = currentRole==='employee' ? employeeScenarios : scenarios;
+  const groups={1:[],2:[],3:[]};
+  pool.forEach(s=>groups[s.difficulty].push(s));
+  shuffle(groups[1]);shuffle(groups[2]);shuffle(groups[3]);
+  return [...groups[1],...groups[2],...groups[3]];
+}
+// Shuffle answer choices (keep correct tracking)
+function shuffleChoices(choices){
+  const indexed=choices.map((c,i)=>({...c,_orig:i}));
+  shuffle(indexed);
+  return indexed;
+}
+let state={currentQ:0,hp:100,maxHp:100,souls:0,hints:2,correctAnswers:0,answered:false,gameOver:false,playerName:'Krieger',startTime:0,learnMode:false,role:'dpo'};
+let currentRole='dpo';
+let playlist=[];
+let timerInterval=null,timerRemaining=TIMER_DURATION;
+
+// --- LEADERBOARD ---
+// ===== SUPABASE CONFIG — HIER DEINE WERTE EINTRAGEN =====
+const SUPABASE_URL = 'DEINE_SUPABASE_URL';       // z.B. https://xyzabc.supabase.co
+const SUPABASE_KEY = 'DEIN_SUPABASE_ANON_KEY';   // langer anon/public key
+
+// ===== SUPABASE API HELPERS =====
+async function sbFetch(path, options={}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || '',
+      ...(options.headers||{})
+    }
+  });
+  if (!res.ok) throw new Error('Supabase error: ' + res.status);
+  return res.status === 204 ? null : res.json();
+}
+
+async function saveLB(entry) {
+  // Lokaler Fallback immer aktualisieren
+  try {
+    const lbKey='adprivacy_lb_'+(entry.role||currentRole);
+    let lb = JSON.parse(localStorage.getItem(lbKey) || '[]');
+    lb.push(entry); lb.sort((a,b)=>b.souls-a.souls||b.correct-a.correct); lb=lb.slice(0,20);
+    localStorage.setItem(lbKey, JSON.stringify(lb));
+  } catch(e) {}
+  // Supabase speichern
+  if (SUPABASE_URL === 'DEINE_SUPABASE_URL') return; // noch nicht konfiguriert
+  try {
+    await sbFetch('leaderboard', {
+      method: 'POST',
+      prefer: 'return=minimal',
+      body: JSON.stringify({
+        name: entry.name,
+        souls: entry.souls,
+        correct: entry.correct,
+        role: entry.role||currentRole,
+        played_at: new Date(entry.time).toISOString()
+      })
+    });
+  } catch(e) {
+    console.warn('Supabase saveLB fehlgeschlagen:', e);
+  }
+}
+
+async function fetchLB(role) {
+  if (SUPABASE_URL === 'DEINE_SUPABASE_URL') {
+    // Fallback auf localStorage wenn Supabase noch nicht konfiguriert
+    try { return JSON.parse(localStorage.getItem('adprivacy_lb_'+(role||currentRole)) || '[]'); } catch(e) { return []; }
+  }
+  try {
+    const data = await sbFetch('leaderboard?select=name,souls,correct,played_at&order=souls.desc,correct.desc&limit=20');
+    return (data || []).map(r => ({name: r.name, souls: r.souls, correct: r.correct, time: new Date(r.played_at).getTime()}));
+  } catch(e) {
+    console.warn('Supabase fetchLB fehlgeschlagen, nutze Cache:', e);
+    try { return JSON.parse(localStorage.getItem('adprivacy_lb_'+(role||currentRole)) || '[]'); } catch(e2) { return []; }
+  }
+}
+
+async function clearLeaderboard() {
+  if (!confirm('Rangliste wirklich löschen?')) return;
+  try { localStorage.removeItem('adprivacy_lb_cache'); } catch(e) {}
+  if (SUPABASE_URL !== 'DEINE_SUPABASE_URL') {
+    try { await sbFetch('leaderboard', { method: 'DELETE', headers: {'Prefer': 'return=minimal'}, body: JSON.stringify({}) }); } catch(e) {}
+  }
+  renderLB();
+}
+
+function getTitle(c){if(c>=18)return{label:'revDSG-Legende ⚔️',cls:'legend'};if(c>=14)return{label:'Datenschutz-Krieger',cls:'warrior'};return{label:'Datenschutz-Lehrling',cls:'apprentice'};}
+
+function renderLBData(lb) {
+  const tbody = document.getElementById('lb-body');
+  if (!lb.length) { tbody.innerHTML='<tr><td colspan="5" class="lb-empty">Noch keine Einträge. Sei der Erste!</td></tr>'; return; }
+  const medals=['gold','silver','bronze'];
+  tbody.innerHTML = lb.map((e,i) => {
+    const t = getTitle(e.correct);
+    return `<tr><td class="lb-rank ${medals[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</td><td class="lb-name">${e.name.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</td><td class="lb-score">${(e.souls||0).toLocaleString()}</td><td class="lb-correct">${e.correct}/${TOTAL_Q}</td><td><span class="lb-badge ${t.cls}">${t.label}</span></td></tr>`;
+  }).join('');
+}
+
+let activeLbRole='employee';
+function switchLbTab(role){
+  activeLbRole=role;
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  const tab=document.getElementById('tab-'+role);
+  if(tab)tab.classList.add('active');
+  renderLB();
+}
+async function renderLB() {
+  const tbody = document.getElementById('lb-body');
+  tbody.innerHTML = '<tr><td colspan="5" class="lb-empty" id="lb-loading">⏳ Lade Rangliste...</td></tr>';
+  const lb = await fetchLB(activeLbRole);
+  renderLBData(lb);
+}
+
+// --- SCREENS ---
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.style.flexDirection='';});
+  const t=document.getElementById(id);t.style.display='flex';t.style.flexDirection='column';
+  setLogos();
+}
+function setLogos(){
+  ['title-logo','hud-logo','victory-logo'].forEach(id=>{const el=document.getElementById(id);if(el&&LOGO_URL)el.src=LOGO_URL;});
+}
+function showRoleScreen(){showScreen('role-screen');}
+
+function selectRole(role){
+  currentRole=role;
+  // Update name screen UI for chosen role
+  const roleLabel=document.getElementById('role-label');
+  const roleIcon=document.getElementById('role-icon');
+  if(roleLabel){
+    if(role==='employee'){
+      roleLabel.textContent='Mitarbeiter-Quiz';
+      if(roleIcon)roleIcon.textContent='💼';
+    } else {
+      roleLabel.textContent='DPO / Datenschutzberater-Quiz';
+      if(roleIcon)roleIcon.textContent='⚖️';
+    }
+  }
+  showNameScreen();
+}
+
+function showNameScreen(){showScreen('name-screen');setTimeout(()=>{const i=document.getElementById('player-name-input');if(i)i.focus();},100);}
+async function showLeaderboard(){
+  // Sync active tab to played role if coming from game
+  if(state.role){
+    activeLbRole=state.role;
+    document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+    const tab=document.getElementById('tab-'+state.role);
+    if(tab)tab.classList.add('active');
+  }
+  showScreen('leaderboard-screen');
+  const st=document.getElementById('lb-status');
+  if(st) st.textContent = SUPABASE_URL==='DEINE_SUPABASE_URL' ? '⚠️ Lokaler Modus — Supabase noch nicht konfiguriert' : '🌐 Verbunden mit Supabase';
+  await renderLB();
+}
+
+// --- TIMER ---
+function startTimer(){
+  stopTimer();timerRemaining=TIMER_DURATION;updateTimerUI();
+  timerInterval=setInterval(()=>{timerRemaining--;updateTimerUI();if(timerRemaining<=0){stopTimer();onTimerExpired();}},1000);
+}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function updateTimerUI(){
+  const pct=timerRemaining/TIMER_DURATION;
+  const r=17,circ=2*Math.PI*r; // r=17 -> ~107
+  const offset=circ*(1-pct);
+  const circle=document.getElementById('timer-circle');
+  const display=document.getElementById('timer-display');
+  if(!circle||!display)return;
+  circle.style.strokeDasharray=circ;
+  circle.style.strokeDashoffset=offset;
+  display.textContent=timerRemaining;
+  if(timerRemaining>15){circle.style.stroke='var(--timer-ok)';display.style.color='var(--gold)';}
+  else if(timerRemaining>7){circle.style.stroke='var(--timer-warn)';display.style.color='var(--timer-warn)';}
+  else{circle.style.stroke='var(--timer-danger)';display.style.color='var(--timer-danger)';}
+}
+function onTimerExpired(){
+  if(state.answered||state.gameOver)return;
+  state.answered=true;
+  const q=playlist[state.currentQ];
+  const buttons=document.getElementsByClassName('choice-btn');
+  for(let i=0;i<buttons.length;i++)buttons[i].disabled=true;
+  const correctBtn=Array.from(buttons).find(b=>b.classList.contains('correct')||false);
+  // reveal correct among visible buttons by checking shuffled data attr
+  Array.from(buttons).forEach(b=>{if(b._isCorrect)b.classList.add('timeout-reveal');});
+  // fallback: just highlight first non-wrong
+  takeDamage();
+  showTimeoutFeedback(q);
+}
+function showTimeoutFeedback(q){
+  const panel=document.getElementById('feedback-panel');
+  panel.style.display='block';panel.className='feedback-panel timeout';
+  document.getElementById('feedback-header').className='feedback-header timeout';
+  document.getElementById('feedback-header').textContent='⏱️ ZEIT ABGELAUFEN!';
+  document.getElementById('feedback-text').textContent='Zu langsam! '+q.failText;
+  document.getElementById('dsgvo-ref').textContent=q.ref;
+  const btn=document.getElementById('continue-btn');
+  btn.className='continue-btn timeout';
+  btn.textContent=state.currentQ>=scenarios.length-1?'⚔️ ZUM ERGEBNIS':'AUFSTEHEN UND WEITER →';
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// --- GAME ---
+function startGame(learnMode=false){
+  const nameInput=document.getElementById('player-name-input');
+  const name=(nameInput?nameInput.value.trim():'')||'Unbekannter Krieger';
+  playlist=buildPlaylist();
+  state={currentQ:0,hp:100,maxHp:100,souls:0,hints:2,correctAnswers:0,answered:false,gameOver:false,playerName:name,startTime:Date.now(),learnMode,role:currentRole};
+  showScreen('game-screen');
+  const hudRole=document.getElementById('hud-role-label');
+  if(hudRole)hudRole.textContent=currentRole==='employee'?'Mitarbeiter-Quiz':'DPO-Quiz';
+  // Show learn mode banner
+  const banner=document.getElementById('learn-banner');
+  if(banner)banner.style.display=learnMode?'block':'none';
+  const timerEl=document.getElementById('timer-container-wrap');
+  if(timerEl)timerEl.style.display=learnMode?'none':'flex';
+  updateHints();
+  renderQuestion();
+}
+function renderQuestion(){
+  const q=playlist[state.currentQ];
+  state.answered=false;
+  // Difficulty badge
+  const diffBadge=document.getElementById('diff-badge');
+  if(diffBadge){
+    const labels={1:'⚔ Lehrling',2:'⚔⚔ Krieger',3:'⚔⚔⚔ Meister'};
+    const colors={1:'#5a8a2a',2:'#c9a84c',3:'#c0392b'};
+    diffBadge.textContent=labels[q.difficulty]||'';
+    diffBadge.style.color=colors[q.difficulty]||'#c9a84c';
+  }
+  document.getElementById('level-name').textContent=q.level;
+  document.getElementById('room-name').textContent=q.room;
+  document.getElementById('enemy-icon').textContent=q.enemy;
+  document.getElementById('enemy-name').textContent=q.enemyName;
+  document.getElementById('scenario-text').textContent=q.scenario;
+  document.getElementById('scenario-tag').textContent=q.tag;
+  document.getElementById('lore-stone').textContent=q.lore;
+  document.getElementById('q-counter').textContent=(state.currentQ+1)+'/'+TOTAL_Q;
+  document.getElementById('progress-fill').style.width=(state.currentQ/TOTAL_Q*100)+'%';
+  const container=document.getElementById('choices-container');
+  container.innerHTML='';
+  const letters=['A','B','C','D'];
+  const shuffled=shuffleChoices(q.choices);
+  for(let ci=0;ci<shuffled.length;ci++){
+    (function(idx,choice){
+      const btn=document.createElement('button');
+      btn.className='choice-btn';
+      btn.innerHTML='<span class="choice-letter">'+letters[idx]+'</span><span>'+choice.text+'</span>';
+      btn.onclick=function(){answerQuestion(btn,choice.correct,shuffled);};
+      container.appendChild(btn);
+    })(ci,shuffled[ci]);
+  }
+  const fb=document.getElementById('feedback-panel');
+  fb.style.display='none';fb.className='feedback-panel';
+  if(!state.learnMode)startTimer(); else{stopTimer();updateTimerUI();}
+}
+function answerQuestion(clickedBtn,correct,shuffled){
+  if(state.answered||state.gameOver)return;
+  state.answered=true;stopTimer();
+  const q=playlist[state.currentQ];
+  const buttons=document.getElementsByClassName('choice-btn');
+  for(let bi=0;bi<buttons.length;bi++)buttons[bi].disabled=true;
+  // Find correct button in shuffled list
+  const correctBtn=Array.from(buttons).find((_,i)=>shuffled[i].correct);
+  if(correct){
+    const bonus=state.learnMode?0:(timerRemaining*10);
+    state.souls+=SOULS_PER_CORRECT+bonus;
+    state.correctAnswers++;
+    clickedBtn.classList.add('correct');
+    showFeedback(true,q);
+    if(!state.learnMode)showSoulPopup();
+    document.getElementById('souls-display').textContent=state.souls.toLocaleString();
+  }else{
+    clickedBtn.classList.add('wrong');
+    if(correctBtn)correctBtn.classList.add('correct');
+    if(!state.learnMode)takeDamage();
+    showFeedback(false,q);
+  }
+}
+function takeDamage(){
+  state.hp=Math.max(0,state.hp-HP_DAMAGE);
+  document.getElementById('hp-fill').style.width=(state.hp/state.maxHp*100)+'%';
+  const overlay=document.getElementById('damage-overlay');
+  overlay.classList.add('flash');setTimeout(()=>overlay.classList.remove('flash'),600);
+  if(state.hp<=0)setTimeout(()=>showDeath(),1500);
+}
+function showSoulPopup(){
+  const pop=document.getElementById('soul-popup');
+  pop.textContent='+'+SOULS_PER_CORRECT+' SEELEN';
+  pop.classList.remove('show');void pop.offsetWidth;pop.classList.add('show');
+  setTimeout(()=>pop.classList.remove('show'),1500);
+}
+function showFeedback(success,q){
+  const panel=document.getElementById('feedback-panel');
+  const btn=document.getElementById('continue-btn');
+  panel.style.display='block';
+  panel.className='feedback-panel '+(success?'success':'failure');
+  document.getElementById('feedback-header').className='feedback-header '+(success?'success':'failure');
+  document.getElementById('feedback-header').textContent=success?q.successMsg:q.failMsg;
+  document.getElementById('feedback-text').textContent=success?q.successText:q.failText;
+  document.getElementById('dsgvo-ref').textContent=q.ref;
+  btn.className='continue-btn '+(success?'success':'failure');
+  btn.textContent=state.currentQ>=scenarios.length-1?'⚔️ ZUM ERGEBNIS':(success?'WEITER KÄMPFEN →':'AUS DEM TOD AUFSTEHEN →');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function nextQuestion(){
+  if(state.hp<=0)return;
+  state.currentQ++;
+  if(state.currentQ>=scenarios.length){
+    if(state.learnMode)showVictory(); else state.correctAnswers>=WIN_THRESHOLD?showVictory():showDeath();
+    return;
+  }
+  renderQuestion();window.scrollTo({top:0,behavior:'smooth'});
+}
+function useHint(){
+  if(state.hints<=0||state.answered)return;
+  const q=scenarios[state.currentQ];
+  let ci=-1;for(let hf=0;hf<q.choices.length;hf++){if(q.choices[hf].correct){ci=hf;break;}}
+  const buttons=document.getElementsByClassName('choice-btn');
+  let elim=0;
+  for(let hi=0;hi<buttons.length&&elim<2;hi++){if(hi!==ci){buttons[hi].style.opacity='.3';buttons[hi].disabled=true;elim++;}}
+  state.hints--;updateHints();
+}
+function updateHints(){
+  const flasks=document.getElementsByClassName('flask');
+  for(let i=0;i<flasks.length;i++)flasks[i].classList.toggle('empty',i>=state.hints);
+}
+function showDeath(){
+  stopTimer();state.gameOver=true;
+  saveLB({name:state.playerName,souls:state.souls,correct:state.correctAnswers,time:Date.now(),role:state.role||currentRole});
+  showScreen('death-screen'); // saveLB runs in background
+  const msgs=["Die Datendämonen haben gesiegt. Compliance verletzt.","Der revDSG-Richter hat das Urteil gesprochen.","Die Bussen regnen nieder. AdPrivacy trauert.","Das Schweizer Datenschutzgesetz wurde unterschätzt."];
+  document.getElementById('death-lore').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  document.getElementById('death-stats').textContent='Richtige Antworten: '+state.correctAnswers+'/'+TOTAL_Q+' • Seelen: '+state.souls.toLocaleString()+(state.learnMode?' • Lernmodus':'');
+}
+function showVictory(){
+  stopTimer();
+  saveLB({name:state.playerName,souls:state.souls,correct:state.correctAnswers,time:Date.now(),role:state.role||currentRole});
+  showScreen('victory-screen'); // saveLB runs in background
+  const t=getTitle(state.correctAnswers);
+  document.getElementById('v-correct').textContent=state.correctAnswers+'/'+TOTAL_Q;
+  document.getElementById('v-souls').textContent=state.souls.toLocaleString();
+  document.getElementById('v-level').textContent=t.label;
+  document.getElementById('v-title-sub').textContent=t.label.toUpperCase();
+  document.getElementById('v-hints').textContent=state.hints+'/2';
+  document.getElementById('progress-fill').style.width='100%';
+}
+
+async function addManualEntry(){
+  const name=(document.getElementById('lb-manual-name').value||'').trim();
+  const souls=parseInt(document.getElementById('lb-manual-score').value)||0;
+  const correct=parseInt(document.getElementById('lb-manual-correct').value)||0;
+  if(!name){alert('Bitte einen Namen eingeben.');return;}
+  if(correct<0||correct>20){alert('Richtige Antworten: 0–20');return;}
+  const btn=document.querySelector('.lb-add-btn');
+  btn.textContent='⏳ Speichern...'; btn.disabled=true;
+  await saveLB({name,souls,correct,time:Date.now()});
+  document.getElementById('lb-manual-name').value='';
+  document.getElementById('lb-manual-score').value='';
+  document.getElementById('lb-manual-correct').value='';
+  btn.textContent='+ EINTRAGEN'; btn.disabled=false;
+  await renderLB();
+}
+window.onload=function(){
+  setLogos();
+  const ni=document.getElementById('player-name-input');
+  if(ni)ni.addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
+  const container=document.getElementById('particles');
+  if(container){for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(5+Math.random()*15)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.width=p.style.height=(1+Math.random()*3)+'px';container.appendChild(p);}}
+};
+</script>
+</body>
+</html>
